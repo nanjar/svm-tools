@@ -1,0 +1,1 @@
+/usr/share/doc/git/contrib/credential/netrc/git-credential-netrc -f /opt/svm-tools/config/git/credentials.gpg get 2>/dev/null
