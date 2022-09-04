@@ -1,6 +1,8 @@
 #!/bin/bash
 
-ENV_NAME="asset-svm-get-router-stat/env"
+SCRIPT_NAME="svm-cmd-router"
+
+ENV_NAME="asset-$SCRIPT_NAME/env"
 CALLER_DIR="$PWD"
 PY_BASE_DIR=$(readlink -f $0 | xargs dirname)/py
 ENV_DIR="$PY_BASE_DIR/$ENV_NAME"
@@ -12,7 +14,7 @@ if [ ! -d "$ENV_DIR" ]; then
   source $ENV_DIR/bin/activate
   echo "Installing necessary packages..."
   cd $PY_BASE_DIR
-  sudo pip3 install -r asset-svm-get-router-stat/requirements.txt
+  sudo pip3 install -r "asset-$SCRIPT_NAME"/requirements.txt
   deactivate
   sudo lock-system
   cd $CALLER_DIR
@@ -22,5 +24,5 @@ fi
 
 deactivate > /dev/null 2>&1
 source $ENV_DIR/bin/activate
-sudo python3 $PY_BASE_DIR/svm-get-router-stat.py "$@"
+sudo python3 "$PY_BASE_DIR/$SCRIPT_NAME.py" "$@"
 
