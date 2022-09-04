@@ -12,19 +12,40 @@ payload = {
     'passwd': 'c3284d0f94606de1fd2af172aba15bf3'
 }
 
-# User param: router param
-params_mapping = {
-    'ccid': 'ccid',
-    'imei': 'imei',
-    'isp': 'isp',
-    'network_name': 'network_name',
-    'network_id': 'network_id',
-    'network_channel': 'network_channel',
-    'network_band': 'network_band',
-    'device_model': 'device_model',
-    'signal_quality': 'signal_quality',
-    '4g_data_usage': 'data'
+# User argument
+# command_arg: {'user_arg': 'router_arg'}
+user_args = {
+    '--get': {
+        'ccid': 'ccid',
+        'imei': 'imei',
+        'isp': 'isp',
+        'network_name': 'network_name',
+        'network_id': 'network_id',
+        'network_channel': 'network_channel',
+        'network_band': 'network_band',
+        'device_model': 'device_model',
+        'signal_quality': 'signal_quality',
+        '4g_data_usage': 'data',
+        'dhcp_lease': 'dhcp_lease',
+        'lan_port': 'lan_port',
+    },
+    '--reboot': {}
 }
+
+
+def reboot_router(__ip_addr: str, __session_token: str) -> bool:
+    is_success = False
+
+    reboot_request = requests.post('http://' + __ip_addr + '/api/system', headers={'X-Token': __session_token}, data={'action': 'reboot'})
+    reboot_request_response = json.loads(reboot_request.text)
+    if len(reboot_request_response) > 0:
+        if reboot_request_response['code'] == 1:
+            is_success = True
+        else:
+            print("Error:", reboot_request_response['msg'])
+            print()
+
+    return is_success
 
 
 def is_router_online(ip_addr: str) -> bool:
@@ -59,35 +80,64 @@ def format_4g_data_usage(raw_data_usage: dict) -> dict:
 
 
 def get_args() -> list:
-    ret_args = None
+    global user_args
+
+    ret_args = []
     if len(sys.argv) > 1:
-        all_params = ''
+        all_params = []
         for index in range(1, len(sys.argv)):
-            all_params += sys.argv[index].strip()
+            user_param = sys.argv[index].strip()
+            if len(user_param) > 0:
+                if ',' in user_param:
+                    param_split = user_param.replace(' ', '').split(',')
+                    param_split = list(filter(None, param_split))
+                    all_params += param_split
+                else:
+                    all_params.append(user_param)
 
-        ret_args = all_params.split(',')
-
-        # Check if the argument is valid
-        for parameter in ret_args:
-            if parameter not in params_mapping:
-                print("Error: Unknown parameter", parameter)
+        # Validate user arguments
+        if '--reboot' in all_params:
+            if len(all_params) > 1:
+                print("Error: Invalid argument")
                 print("")
-                ret_args = None
-                break
+                all_params = None
+        elif '--reboot' in all_params and '--get' in all_params:
+            all_params = None
+        elif '--get' in all_params:
+            if len(all_params) > 1:
+                for parameter in all_params:
+                    if parameter != '--get':
+                        if parameter not in user_args['--get']:
+                            print("Error: Wrong argument", parameter)
+                            print("")
+                            all_params = None
+                            break
+            else:
+                all_params = None
+                print("Error: Command '--get' need to be followed by param")
+                print("")
+
+        ret_args = all_params
 
     return ret_args
 
 
 def display_usage():
-    print("====================================================")
-    print("               svm-get-router-stat                  ")
-    print("                     HS@2022                        ")
-    print("====================================================")
-    print("Usage: svm-get-router-stat.sh [param1],[param2],..[param_n]")
-    print("e.g: svm-get-router-stat.sh ccid,signal_quality")
+    print("=======================================================")
+    print("                    svm-cmd-router                     ")
+    print("                        HS@2022                        ")
+    print("=======================================================")
+    print("Usage: svm-cmd-router.sh [command] [param1],..[param_n]")
+    print("e.g: svm-cmd-router.sh --get ccid,signal_quality")
+    print("     svm-cmd-router.sh --reboot")
     print("")
-    print("params             Details")
-    print("======             =======")
+    print("command            Details")
+    print("=======            =======")
+    print("--get [param]    : Get router info")
+    print("--reboot         : Reboot router")
+    print("")
+    print("--get params       Details")
+    print("============       =======")
     print("ccid             : SIM card id")
     print("imei             : Router imei")
     print("isp              : Internet service provider")
@@ -107,17 +157,23 @@ if __name__ == '__main__':
 
     args = get_args()
     # print(args)
-    if args is not None:
+    if args is not None and len(args) > 0:
         if is_router_online(ROUTER_IPADDR):
             ret_response_value: dict = {}
             login_req = requests.post('http://' + ROUTER_IPADDR + '/api/login', data=payload)
             
             if "Not Found" in login_req:
                 print("Error: Unable to retrieve data from router")
+                print("")
                 exit()
                 
             login_req_response = json.loads(login_req.text)
             session_token = login_req_response['token']
+
+            # Check if the param is reboot action
+            if '--reboot' in args:
+                reboot_router(ROUTER_IPADDR, session_token)
+                exit()
 
             network_info_req = requests.get('http://' + ROUTER_IPADDR + '/api/network?action=list&dev=wwan0&token=' + session_token + '&_=1643135948017')
             network_info_req_response = json.loads(network_info_req.text)
@@ -131,7 +187,7 @@ if __name__ == '__main__':
             dhcp_lease_req = requests.get('http://' + ROUTER_IPADDR + '/api/network?action=dhcp_lease&token=' + session_token + '&_=1643135948017')
             # dhcp_lease_req_response: [[{'expires': 4760, 'hostname': 'SVM77', 'ipaddr': '192.168.1.101', 'macaddr': 'e4-5f-01-6b-95-31'}], []]
             dhcp_lease_req_response = json.loads(dhcp_lease_req.text)
-            #print("dhcp_lease_req_response:", dhcp_lease_req_response)
+            # print("dhcp_lease_req_response:", dhcp_lease_req_response)
 
             # http://192.168.1.1/api/network?action=list&dev=lan&token=04b4920313f6f46da266196f433e3f7f&_=1647302940972
             lan_port_info_req = requests.get('http://' + ROUTER_IPADDR + '/api/network?action=list&dev=lan&token=' + session_token + '&_=1643135948017')
@@ -144,16 +200,22 @@ if __name__ == '__main__':
                 if param == '4g_data_usage':
                     data_usage_req_response = format_4g_data_usage(data_usage_req_response)
                     ret_response_value[param] = data_usage_req_response
+                elif param == 'dhcp_lease':
+                    ret_response_value[param] = dhcp_lease_req_response
+                elif param == 'lan_port':
+                    ret_response_value[param] = lan_port_info_req_response
                 else:
                     if param in network_info_req_response:
-                        ret_response_value[param] = str(network_info_req_response[params_mapping[param]])
+                        ret_response_value[param] = str(network_info_req_response[user_args['--get'][param]])
                     else:
                         ret_response_value[param] = ""
 
             if len(ret_response_value) > 0:
+                del ret_response_value['--get']
                 print(ret_response_value)
 
         else:
-            print("Error: Router not found")
+            print("Error: Router is not online")
+            print("")
     else:
         display_usage()
