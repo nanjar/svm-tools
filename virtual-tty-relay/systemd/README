@@ -1,5 +1,8 @@
+# Deploy service to systemd
 sudo unlock-system
-sudo cp virtual-tty-relay.service /etc/systemd/system/
+sudo cp /opt/svm-tools/virtual-tty-relay/systemd/virtual-tty-relay.service /etc/systemd/system/
 sudo systemctl enable virtual-tty-relay.service
 sudo lock-system
 sudo systemctl restart virtual-tty-relay.service
+
+# Change vending_machine serial_port to: /var/run/virtualport/ttyVM
