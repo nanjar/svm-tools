@@ -34,15 +34,15 @@ if __name__ == '__main__':
         if ui_state is not None:
             if ui_state:
                 # Show scheduled restart image
-                subprocess.call(['python3', '/opt/svm-tools/py/svm-show-image.py', '--file', SCHEDULED_MAINTENANCE_IMG_FILE, '--display :0.0', '&'])
+                subprocess.Popen(['python3', '/opt/svm-tools/py/svm-show-image.py', '--file', SCHEDULED_MAINTENANCE_IMG_FILE, '--display', ':0.0'])
 
                 # Stop ui
                 subprocess.call(['pm2', 'stop', 'all'])
-                time.sleep(2)
-
+                
                 # Restart router
                 subprocess.call(['/opt/svm-tools/svm-cmd-router.sh', '--reboot'])
-
+                time.sleep(5)
+                
                 # Restart raspi
                 subprocess.call(['sudo', 'bash', '-c', 'reboot', 'now'])
 
