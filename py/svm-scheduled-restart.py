@@ -42,6 +42,9 @@ if __name__ == '__main__':
                 # Restart router
                 subprocess.call(['/opt/svm-tools/svm-cmd-router.sh', '--reboot'])
                 time.sleep(5)
+              
+                # Save current time to fake-hwclock data
+                subprocess.call(['fake-hwclock', 'save', 'force'])
                 
                 # Restart raspi
                 subprocess.call(['sudo', 'bash', '-c', 'reboot', 'now'])
