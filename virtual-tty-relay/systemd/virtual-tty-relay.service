@@ -1,0 +1,14 @@
+[Unit]
+Description=Service to initialize smart vending machine from zero
+
+[Service]
+Type=simple
+ExecStart=/opt/svm-tools/virtual-tty-relay/virtual-tty-relay.sh
+TimeoutSec=30
+RestartSec=15s
+Restart=always
+User=pi
+Group=pi
+
+[Install]
+WantedBy=multi-user.target
