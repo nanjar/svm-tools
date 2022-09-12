@@ -20,7 +20,7 @@ DELAY_IF_BUSY_SECOND = 300
 
 def is_ui_idle() -> bool:
     try:
-        if pathlib.Path(UI_STATE_FILE).read_text() == 'idle':
+        if pathlib.Path(UI_STATE_FILE).read_text().strip() == 'idle':
             return True
         else:
             return False
@@ -46,6 +46,7 @@ if __name__ == '__main__':
                 # Restart raspi
                 subprocess.call(['sudo', 'bash', '-c', 'reboot', 'now'])
 
+                break
             else:
                 time.sleep(DELAY_IF_BUSY_SECOND)
         else:
