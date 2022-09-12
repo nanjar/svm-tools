@@ -47,7 +47,7 @@ if __name__ == '__main__':
                 subprocess.call(['fake-hwclock', 'save', 'force'])
                 
                 # Restart raspi
-                subprocess.call(['sudo', 'bash', '-c', 'reboot', 'now'])
+                subprocess.call(['sudo', 'reboot', 'now'])
 
                 break
             else:
