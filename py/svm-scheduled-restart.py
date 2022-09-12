@@ -32,7 +32,7 @@ if __name__ == '__main__':
     while True:
         ui_state = is_ui_idle()
         if ui_state is not None:
-            if ui_state == 'idle':
+            if ui_state:
                 # Show scheduled restart image
                 subprocess.call(['python3', '/opt/svm-tools/py/svm-show-image.py', '--file', SCHEDULED_MAINTENANCE_IMG_FILE, '--display :0.0', '&'])
 
