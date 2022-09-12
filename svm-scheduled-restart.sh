@@ -12,9 +12,13 @@ if [ ! -d "$ENV_DIR" ]; then
   echo "Creating env only for the first time..."
   sudo python3 -m venv $ENV_DIR
   source $ENV_DIR/bin/activate
+  echo "Installing necessary packages..."
+  cd $PY_BASE_DIR
+  sudo pip3 install -r "asset-$SCRIPT_NAME"/requirements.txt
   deactivate
   sudo lock-system
   cd $CALLER_DIR
+  echo "Packages installation is done."
   echo ""
 fi
 
