@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_NAME="virtual-tty"
+SCRIPT_NAME="virtual-tty-relay"
 
 ENV_NAME="asset-$SCRIPT_NAME/env"
 CALLER_DIR="$PWD"
