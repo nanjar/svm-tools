@@ -13,7 +13,7 @@ import subprocess
 
 
 UI_STATE_FILE = '/var/run/smartvending/ui.state'
-UNDER_MAINTENANCE_IMG_FILE = ''
+SCHEDULED_MAINTENANCE_IMG_FILE = '/opt/svm-tools/img/svm-img-scheduled-maintenance.png'
 
 DELAY_IF_BUSY_SECOND = 300
 
@@ -33,11 +33,12 @@ if __name__ == '__main__':
         ui_state = is_ui_idle()
         if ui_state is not None:
             if ui_state == 'idle':
-                # Show under maintenance image
-                subprocess.call([])
+                # Show scheduled restart image
+                subprocess.call(['python3', '/opt/svm-tools/py/svm-show-image.py', '--file', SCHEDULED_MAINTENANCE_IMG_FILE, '--display :0.0', '&'])
 
                 # Stop ui
                 subprocess.call(['pm2', 'stop', 'all'])
+                time.sleep(2)
 
                 # Restart router
                 subprocess.call(['/opt/svm-tools/svm-cmd-router.sh', '--reboot'])
