@@ -1,0 +1,5 @@
+sudo unlock-system
+sudo cp virtual-tty-relay.service /etc/systemd/system/
+sudo systemctl enable virtual-tty-relay.service
+sudo lock-system
+sudo systemctl restart virtual-tty-relay.service
