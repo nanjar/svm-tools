@@ -44,10 +44,10 @@ if __name__ == '__main__':
                 time.sleep(5)
               
                 # Save current time to fake-hwclock data
-                subprocess.call(['fake-hwclock', 'save', 'force'])
+                subprocess.call(['/usr/sbin/fake-hwclock', 'save', 'force'])
                 
                 # Restart raspi
-                subprocess.call(['sudo', 'reboot', 'now'])
+                subprocess.call(['sudo', '/usr/sbin/reboot', 'now'])
 
                 break
             else:
