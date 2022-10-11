@@ -24,6 +24,12 @@ if [ ! -d /var/log/smartvending/controller ]; then
     sudo chmod -Rf o+w /var/log/smartvending/controller
 fi
 
+if [ ! -d /var/log/smartvending/system ]; then
+    sudo mkdir /var/log/smartvending/system
+    sudo chown pi.pi /var/log/smartvending/system
+    sudo chmod -Rf o+w /var/log/smartvending/system
+fi
+
 if [ ! -L /smartvending/server/log ]; then
     if [ -d /smartvending/server/log ]; then
         sudo rm -Rf /smartvending/server/log
