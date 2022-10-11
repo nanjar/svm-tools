@@ -83,7 +83,7 @@ cleanup_init_machine_flag() {
 
 wait_xserver() {
     # Wait until X is ready
-    while [ ! -f "/run/X-ready.tmp" ]
+    while [ ! -f "/run/x.ready" ]
     do
         sleep 1
     done
