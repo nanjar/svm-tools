@@ -156,20 +156,10 @@ def create_ui_set_vmid(parent: tkinter, window_color: str):
     global textbox_userinput_set_svmid
     global handler_btn_numpad
 
-    btn_data: dict = {}
+    btn_data: dict = {'set': [510, 260, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-pressed.png')], '1': [127, 390, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-1.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-1-pressed.png')], '2': [326, 390, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-2.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-2-pressed.png')], '3': [525, 390, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-3.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-3-pressed.png')],
+                      '4': [127, 516, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-4.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-4-pressed.png')], '5': [326, 516, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-5.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-5-pressed.png')], '6': [525, 516, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-6.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-6-pressed.png')], '7': [127, 642, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-7.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-7-pressed.png')],
+                      '8': [326, 642, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-8.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-8-pressed.png')], '9': [525, 642, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-9.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-9-pressed.png')], '0': [425, 770, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-0.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-0-pressed.png')], 'clear': [126, 770, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-clear.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-clear-pressed.png')]}
     # [button_type] = {[x, y, image_button, image_button_pressed]}
-    btn_data['set'] = [510, 260, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-pressed.png')]
-    btn_data['1'] = [127, 390, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-1.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-1-pressed.png')]
-    btn_data['2'] = [326, 390, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-2.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-2-pressed.png')]
-    btn_data['3'] = [525, 390, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-3.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-3-pressed.png')]
-    btn_data['4'] = [127, 516, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-4.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-4-pressed.png')]
-    btn_data['5'] = [326, 516, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-5.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-5-pressed.png')]
-    btn_data['6'] = [525, 516, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-6.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-6-pressed.png')]
-    btn_data['7'] = [127, 642, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-7.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-7-pressed.png')]
-    btn_data['8'] = [326, 642, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-8.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-8-pressed.png')]
-    btn_data['9'] = [525, 642, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-9.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-9-pressed.png')]
-    btn_data['0'] = [425, 770, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-0.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-0-pressed.png')]
-    btn_data['clear'] = [126, 770, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-clear.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-clear-pressed.png')]
 
     for btn_key in btn_data:
         btn_obj = Button(parent, image=btn_data[btn_key][2], borderwidth=0, activeforeground=window_color, activebackground=window_color)
@@ -197,20 +187,13 @@ def create_ui_activate_wifi(parent: tkinter, window_color: str):
     global img_holder
     global handler_btn_wifi
 
-    btn_data: dict = {}
+    btn_data: dict = {'1': [900, 260, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-1.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-1.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-1-pressed.png')], '2': [1099, 260, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-2.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-2.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-2-pressed.png')],
+                      '3': [1298, 260, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-3.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-3.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-3-pressed.png')], '4': [1497, 260, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-4.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-4.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-4-pressed.png')],
+                      '5': [900, 386, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-5.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-5.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-5-pressed.png')], '6': [1099, 386, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-6.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-6.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-6-pressed.png')],
+                      '7': [1298, 386, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-7.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-7.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-7-pressed.png')], '8': [1497, 386, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-8.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-8.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-8-pressed.png')],
+                      '9': [900, 512, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-9.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-9.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-9-pressed.png')], '10': [1099, 512, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-10.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-10.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-10-pressed.png')],
+                      '11': [1298, 512, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-11.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-11.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-11-pressed.png')], '12': [1497, 512, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-12.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-12.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-12-pressed.png')]}
     # [button_type] = {[x, y, image_wifi_on, image_wifi_off, image_wifi_pressed]}
-    btn_data['1'] = [900, 260, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-1.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-1.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-1-pressed.png')]
-    btn_data['2'] = [1099, 260, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-2.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-2.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-2-pressed.png')]
-    btn_data['3'] = [1298, 260, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-3.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-3.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-3-pressed.png')]
-    btn_data['4'] = [1497, 260, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-4.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-4.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-4-pressed.png')]
-    btn_data['5'] = [900, 386, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-5.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-5.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-5-pressed.png')]
-    btn_data['6'] = [1099, 386, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-6.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-6.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-6-pressed.png')]
-    btn_data['7'] = [1298, 386, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-7.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-7.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-7-pressed.png')]
-    btn_data['8'] = [1497, 386, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-8.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-8.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-8-pressed.png')]
-    btn_data['9'] = [900, 512, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-9.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-9.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-9-pressed.png')]
-    btn_data['10'] = [1099, 512, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-10.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-10.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-10-pressed.png')]
-    btn_data['11'] = [1298, 512, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-11.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-11.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-11-pressed.png')]
-    btn_data['12'] = [1497, 512, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-12.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-12.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-12-pressed.png')]
 
     for btn_key in btn_data:
         btn_obj = Button(parent, image=btn_data[btn_key][3], borderwidth=0, activeforeground=window_color, activebackground=window_color)
@@ -278,7 +261,12 @@ def set_all_button_enable(enabled: bool):
     global handler_btn_numpad
 
     if enabled:
-        handler_btn_continue['state'] = 'normal'
+        # Only enable continue button if the svmid is already set, otherwise keep it disabled
+        if has_svmid_set():
+            handler_btn_continue['state'] = 'normal'
+        else:
+            handler_btn_continue['state'] = 'disabled'
+
         for btn_key in handler_btn_wifi:
             handler_btn_wifi[btn_key][0]['state'] = 'normal'
         for btn_key in handler_btn_numpad:
@@ -355,7 +343,7 @@ def event_button_set_wifi_profile_released(wifi_button_type: str):
             btn = handler_btn_wifi[wifi_button_type]
             btn[0].config(image=btn[2])
 
-            if int(wifi_button_type) >= 1 and int(wifi_button_type) <= 12:
+            if 1 <= int(wifi_button_type) <= 12:
                 buffer_process_wifi_profile = wifi_button_type
 
     except Exception:
@@ -633,6 +621,15 @@ def set_wpa(wpa_no: str) -> bool:
     set_all_button_enable(True)
     stop_gear_animation()
     return success
+
+
+def has_svmid_set() -> bool:
+    global handler_label_status_data
+
+    if handler_label_status_data['status_val1'][3]['text'] == 'tidak ada':
+        return False
+    else:
+        return True
 
 
 def task_set_svm_id():
