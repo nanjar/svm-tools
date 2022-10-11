@@ -18,9 +18,17 @@ VIRTUAL_BUTTON_PATH = '/var/run/virtualport'
 VIRTUAL_BUTTON_PORT_SRC0 = VIRTUAL_BUTTON_PATH + '/' + 'ttyVM'
 VIRTUAL_BUTTON_PORT_SRC1 = VIRTUAL_BUTTON_PATH + '/' + 'ttyCTRL'
 
+LOG_ENABLE_ENV_NAME='VIRTUAL_TTY_LOG_ENABLE'
+LOG_PATH_ENV_NAME='VIRTUAL_TTY_LOG_PATH'
+
+IS_LOG_ENABLE = False
+LOG_PATH = ''
+
 is_running: bool = False
 qbuffer_recv_tty_sr1 = queue.Queue()
 
+__lock_log = threading.Lock()
+    
 
 def onrecv_src0(__virtual_tty, __tty: serial.Serial):
     global is_running
@@ -29,6 +37,7 @@ def onrecv_src0(__virtual_tty, __tty: serial.Serial):
         if __virtual_tty_incoming is not None and len(__virtual_tty_incoming) > 0:
             __tty.write(__virtual_tty_incoming)
             # print("onrecv_src0:", ''.join(format(my_int, '02X') for my_int in __virtual_tty_incoming))
+            write_log("recv virtual tty: " + ''.join(format(my_int, '02X') for my_int in __virtual_tty_incoming))
         time.sleep(0.3)
 
 
@@ -38,6 +47,7 @@ def onrecv_src1(__virtual_tty):
         __virtual_tty_incoming = os.read(__virtual_tty, 1000)
         if __virtual_tty_incoming is not None and len(__virtual_tty_incoming) > 0:
             # print("onrecv_src1:", ''.join(format(my_int, '02X') for my_int in __virtual_tty_incoming))
+            write_log("recv virtual button: " + ''.join(format(my_int, '02X') for my_int in __virtual_tty_incoming))
             qbuffer_recv_tty_sr1.put_nowait(__virtual_tty_incoming)
         time.sleep(0.3)
 
@@ -50,6 +60,7 @@ def onrecv_tty_port(__tty: serial.Serial):
                 __tty_incoming = __tty.read(30)
                 if __tty_incoming is not None and len(__tty_incoming) > 0:
                     # print("onrecv_tty_port:", ''.join(format(my_int, '02X') for my_int in __tty_incoming))
+                    write_log("recv machine: " + ''.join(format(my_int, '02X') for my_int in __tty_incoming))
                     qbuffer_recv_tty_sr1.put_nowait(__tty_incoming)
         except:
             pass
@@ -61,7 +72,25 @@ def sigint_handler(sig, frame):
     is_running = False
 
 
+def write_log(message: str):
+    global LOG_PATH
+    global IS_LOG_ENABLE
+    global __lock_log
+    
+    __lock_log.acquire()
+    if IS_LOG_ENABLE:
+        with open(LOG_PATH, "a") as fd:
+            fd.write(str(datetime.now(self.__system_tz()).isoformat(sep=' ', timespec='milliseconds')) + ' [DEBUG]: [VirtualTTY] ' + str(message) + '\r\n')
+    __lock_log.release()
+    
+
 if __name__ == '__main__':
+    if os.environ.get(LOG_PATH_ENV_NAME) is not None and len(os.environ.get(LOG_PATH_ENV_NAME)) > 0:
+        LOG_PATH = os.environ.get(LOG_PATH_ENV_NAME))
+        
+    if os.environ.get(LOG_ENABLE_ENV_NAME) is not None and os.environ.get(LOG_ENABLE_ENV_NAME).lower() == 'true':
+        IS_LOG_ENABLE = True       
+        
     master_src0, slave_src0 = pty.openpty()
     virtual_tty0 = os.ttyname(slave_src0)
     tty.setraw(master_src0, termios.TCSANOW)
@@ -112,5 +141,6 @@ if __name__ == '__main__':
         if qbuffer_recv_tty_sr1.qsize() > 0:
             buffer_out = qbuffer_recv_tty_sr1.get_nowait()
             # print("to master_src0:", ''.join(format(my_int, '02X') for my_int in buffer_out))
+            write_log("send virtual tty: " + ''.join(format(my_int, '02X') for my_int in buffer_out))
             os.write(master_src0, buffer_out)
         time.sleep(0.5)
