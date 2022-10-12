@@ -810,7 +810,10 @@ def task_tk_window():
 
     handler_btn_continue.bind("<ButtonPress>", lambda event: event_button_continue_pressed())
     handler_btn_continue.bind("<ButtonRelease>", lambda event: event_button_continue_released())
-
+    
+    # Initialise at disabled state
+    handler_btn_continue['state'] = 'disabled'
+    
     create_ui_set_vmid(canvas, BACKGROUND_COLOR)
     create_ui_activate_wifi(canvas, BACKGROUND_COLOR)
     create_ui_status(canvas, BACKGROUND_COLOR)
