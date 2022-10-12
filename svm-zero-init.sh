@@ -102,7 +102,7 @@ flag_startup_startvpn() {
 flag_startup_startvpn_persistence() {
     if [ -f "/boot/startvpn_p" ]; then
         sudo unlock-system boot
-        sudo mv /boot/startvpn /etc/openvpn/client.conf
+        sudo mv /boot/startvpn_p /etc/openvpn/client.conf
         sudo systemctl enable openvpn.service
         sudo systemctl restart openvpn.service
         sudo lock-system
