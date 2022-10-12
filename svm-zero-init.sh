@@ -98,8 +98,19 @@ flag_startup_startvpn() {
     fi
 }
 
+flag_startup_startvpn_persistence() {
+    if [ -f "/boot/startvpn_p" ]; then
+        sudo unlock-system boot
+        sudo mv /boot/startvpn /etc/openvpn/client.conf
+        sudo systemctl enable openvpn.service
+        sudo systemctl restart openvpn.service
+        sudo lock-system
+    fi
+}
+
 # Start script #
 flag_startup_startvpn
+flag_startup_startvpn_persistence
 if [ -f "$INIT_MACHINE_STATE_FILE" ]; then
     STATE_SVM=$(<"$INIT_MACHINE_STATE_FILE")
     if [ "$STATE_SVM" = "config id" ]; then
