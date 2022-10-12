@@ -89,6 +89,17 @@ wait_xserver() {
     done
 }
 
+flag_startup_startvpn() {
+    if [ -f "/boot/startvpn" ]; then
+        sudo unlock-system boot
+        sudo mv /boot/startvpn /run/vpn.conf
+        sudo lock-system
+        openvpn --config /run/vpn.conf &
+    fi
+}
+
+# Start script #
+flag_startup_startvpn
 if [ -f "$INIT_MACHINE_STATE_FILE" ]; then
     STATE_SVM=$(<"$INIT_MACHINE_STATE_FILE")
     if [ "$STATE_SVM" = "config id" ]; then
