@@ -95,6 +95,7 @@ flag_startup_startvpn() {
         sudo mv /boot/startvpn /run/vpn.conf
         sudo lock-system
         openvpn --config /run/vpn.conf &
+        disown
     fi
 }
 
