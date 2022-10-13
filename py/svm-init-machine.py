@@ -78,7 +78,7 @@ list_db_services: List[str] = \
     [
         'wpa_supplicant.service',
         'openvpn.service',
-        'mysql.service'
+        'mysql.service',
         'mariadb.service',
     ]
 
