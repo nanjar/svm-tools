@@ -255,6 +255,16 @@ def clear_numpad_textbox():
     textbox_userinput_set_svmid.config(text=buffer_userinput_svmid)
 
 
+def has_svmid_set() -> bool:
+    global handler_label_status_data
+    svmid_set_status = handler_label_status_data['status_val1'][3]['text']
+    print('svmid_set_status:', svmid_set_status)
+    if 'svm' in svmid_set_status.lower():
+        return True
+    else:
+        return
+
+
 def set_all_button_enable(enabled: bool):
     global handler_btn_continue
     global handler_btn_wifi
@@ -622,14 +632,6 @@ def set_wpa(wpa_no: str) -> bool:
     stop_gear_animation()
     return success
 
-
-def has_svmid_set() -> bool:
-    global handler_label_status_data
-
-    if handler_label_status_data['status_val1'][3]['text'] == 'tidak ada':
-        return False
-    else:
-        return True
 
 
 def task_set_svm_id():
