@@ -1,6 +1,10 @@
 import subprocess
 import threading
 import datetime
+
+import dateutil.tz
+# from dateutil import tz
+import dateutil
 import pathlib
 import time
 import os
@@ -15,12 +19,14 @@ import os
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
+SYSTEM_REBOOT_LOCAL_TIME_H_M_S = '15:50:00'
+WAIT_IF_UI_BUSY_SECOND = 300
+IS_LOG_ENABLE = True
+LOG_PATH = '/var/log/smartvending/system/svm-scheduled-restart.log'
+
+LOOP_DELAY_SECOND = 5
 UI_STATE_FILE = '/var/run/smartvending/ui.state'
 SCHEDULED_MAINTENANCE_IMG_FILE = '/opt/svm-tools/img/svm-img-scheduled-maintenance.png'
-
-DELAY_IF_BUSY_SECOND = 300
-IS_LOG_ENABLE = False
-LOG_PATH = '/var/log/smartvending/system/svm-scheduled-restart.log'
 
 __lock_log = threading.Lock()
 
@@ -67,6 +73,26 @@ def get_system_time_utc() -> datetime:
     return datetime.datetime.utcnow()
 
 
+def get_system_time_local() -> datetime:
+    return get_system_time_utc().replace(tzinfo=dateutil.tz.tzlocal())
+
+
+def is_system_time_ready() -> bool:
+    fake_hwclock_datafile = get_fake_hwclock_datafile()
+    if len(fake_hwclock_datafile) > 0:
+        # fake_hwclock data is stored in UTC format, data e.g: 2022-10-15 04:30:35
+        with open(fake_hwclock_datafile, 'r') as fd:
+            # output = fd.read().strip()
+            fake_hwclock_datetime = datetime.datetime.strptime(fd.read().strip() + '+0', '%Y-%m-%d %H:%M:S%z')
+            write_log("fake_hwclock_datetime: " + str(fake_hwclock_datetime))
+        if get_system_time_utc() > fake_hwclock_datetime:
+            return True
+        else:
+            return False
+    else:
+        return False
+
+
 def is_ui_idle() -> bool:
     try:
         if pathlib.Path(UI_STATE_FILE).read_text().strip() == 'idle':
@@ -77,97 +103,57 @@ def is_ui_idle() -> bool:
         return None
 
 
+def exec_system_reboot():
+    # Show scheduled restart image
+    subprocess.Popen(['python3', '/opt/svm-tools/py/svm-show-image.py', '--file', SCHEDULED_MAINTENANCE_IMG_FILE, '--display', ':0.0'])
+
+    # Stop ui
+    subprocess.call(['pm2', 'stop', 'all'])
+
+    # Restart router
+    subprocess.call(['/opt/svm-tools/svm-cmd-router.sh', '--reboot'])
+
+    # Save current time to fake-hwclock data
+    subprocess.call(['/usr/sbin/fake-hwclock', 'save', 'force'])
+    time.sleep(5)
+
+    # Restart raspi
+    subprocess.call(['sudo', '/usr/sbin/reboot', 'now'])
+
+
+def is_next_day(__prev_date_local: datetime) -> bool:
+    if get_system_time_local().date() - __prev_date_local().date() > 0:
+        return True
+    else:
+        return False
+
+
 if __name__ == '__main__':
+    write_log("Starting svm-scheduled-restart...")
+    while not is_system_time_ready():
+        write_log("Waiting system time be ready...")
+        time.sleep(LOOP_DELAY_SECOND)
+
+    prev_datetime_local = get_system_time_local()
+    tmp_dt = datetime.datetime.strptime(SYSTEM_REBOOT_LOCAL_TIME_H_M_S, '%H:%M:%S')
+    reboot_scheduled_datetime_local = get_system_time_local().replace(hour=tmp_dt.hour, minute=tmp_dt.minute, second=tmp_dt.second)
+
     while True:
-        write_log("Current system time: " + str(get_system_time_utc))
-        time.sleep(1)
+        system_local_time = get_system_time_local()
+        max_elapsed_local_time = system_local_time + datetime.timedelta(seconds=10)
 
-    # while True:
-    #     ui_state = is_ui_idle()
-    #     if ui_state is not None:
-    #         if ui_state:
-    #             # Show scheduled restart image
-    #             subprocess.Popen(['python3', '/opt/svm-tools/py/svm-show-image.py', '--file', SCHEDULED_MAINTENANCE_IMG_FILE, '--display', ':0.0'])
-    #
-    #             # Stop ui
-    #             subprocess.call(['pm2', 'stop', 'all'])
-    #
-    #             # Restart router
-    #             subprocess.call(['/opt/svm-tools/svm-cmd-router.sh', '--reboot'])
-    #
-    #             # Save current time to fake-hwclock data
-    #             subprocess.call(['/usr/sbin/fake-hwclock', 'save', 'force'])
-    #             time.sleep(5)
-    #
-    #             # Restart raspi
-    #             subprocess.call(['sudo', '/usr/sbin/reboot', 'now'])
-    #
-    #             break
-    #         else:
-    #             time.sleep(DELAY_IF_BUSY_SECOND)
-    #     else:
-    #         print("Error: Unable to find", UI_STATE_FILE, ". Please update shakecontroller.")
-    #         break
+        write_log("Loop...")
+        write_log("system_local_time: " + str(system_local_time))
+        write_log("max_elapsed_local_time: " + str(max_elapsed_local_time))
 
+        if reboot_scheduled_datetime_local < system_local_time < max_elapsed_local_time:
+            # exec_system_reboot()
+            write_log("exec_system_reboot")
+            time.sleep(20)
 
+        if is_next_day(prev_datetime_local):
+            max_elapsed_local_time.replace(day=system_local_time.day)
 
+        write_log("Current time: " + str(get_system_time_utc()))
+        time.sleep(LOOP_DELAY_SECOND)
 
-
-
-# import pathlib
-# import time
-# import subprocess
-#
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# #  svm-scheduled-restart
-# #
-# #  Schedule restart router and raspberry pi system
-# #
-# #
-# #  HS@2022
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#
-#
-# UI_STATE_FILE = '/var/run/smartvending/ui.state'
-# SCHEDULED_MAINTENANCE_IMG_FILE = '/opt/svm-tools/img/svm-img-scheduled-maintenance.png'
-#
-# DELAY_IF_BUSY_SECOND = 300
-#
-#
-# def is_ui_idle() -> bool:
-#     try:
-#         if pathlib.Path(UI_STATE_FILE).read_text().strip() == 'idle':
-#             return True
-#         else:
-#             return False
-#     except:
-#         return None
-#
-#
-# if __name__ == '__main__':
-#     while True:
-#         ui_state = is_ui_idle()
-#         if ui_state is not None:
-#             if ui_state:
-#                 # Show scheduled restart image
-#                 subprocess.Popen(['python3', '/opt/svm-tools/py/svm-show-image.py', '--file', SCHEDULED_MAINTENANCE_IMG_FILE, '--display', ':0.0'])
-#
-#                 # Stop ui
-#                 subprocess.call(['pm2', 'stop', 'all'])
-#
-#                 # Restart router
-#                 subprocess.call(['/opt/svm-tools/svm-cmd-router.sh', '--reboot'])
-#
-#                 # Save current time to fake-hwclock data
-#                 subprocess.call(['/usr/sbin/fake-hwclock', 'save', 'force'])
-#                 time.sleep(5)
-#
-#                 # Restart raspi
-#                 subprocess.call(['sudo', '/usr/sbin/reboot', 'now'])
-#
-#                 break
-#             else:
-#                 time.sleep(DELAY_IF_BUSY_SECOND)
-#         else:
-#             print("Error: Unable to find", UI_STATE_FILE, ". Please update shakecontroller.")
-#             break
