@@ -1,10 +1,10 @@
 import subprocess
 import threading
 import datetime
-
+import shutil
 import dateutil.tz
 # from dateutil import tz
-import dateutil
+# import dateutil
 import pathlib
 import time
 import os
@@ -19,7 +19,7 @@ import os
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
-SYSTEM_REBOOT_LOCAL_TIME_H_M_S = '15:50:00'
+SYSTEM_REBOOT_SCHEDULED_LOCAL_TIME = '02:30:00'
 WAIT_IF_UI_BUSY_SECOND = 300
 IS_LOG_ENABLE = True
 LOG_PATH = '/var/log/smartvending/system/svm-scheduled-restart.log'
@@ -44,6 +44,7 @@ def write_log(message: str):
             system_tz = datetime.timezone(datetime.timedelta(seconds=-time.timezone), time.tzname[0])
 
         with open(LOG_PATH, "a") as fd:
+            print(str(datetime.datetime.now(system_tz).isoformat(sep=' ', timespec='milliseconds')) + ' [DEBUG]: [SvmScheduledRestart] ' + str(message))
             fd.write(str(datetime.datetime.now(system_tz).isoformat(sep=' ', timespec='milliseconds')) + ' [DEBUG]: [SvmScheduledRestart] ' + str(message) + '\r\n')
     __lock_log.release()
 
@@ -54,8 +55,8 @@ def get_fake_hwclock_datafile() -> str:
     fake_hwclock_default_datafile = '/etc/fake-hwclock.data'
 
     # Check if fake-hwclock is available
-    output = subprocess.run(['command', '-v', fake_hwclock_cmd], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
-    if output is not None and len(output.stdout) > 0:
+    test_cmd = shutil.which(fake_hwclock_cmd)
+    if test_cmd is not None and len(test_cmd) > 0:
         datafile = os.environ.get(fake_hwclock_dataenv)
         if datafile is not None:
             return datafile
@@ -70,11 +71,11 @@ def get_fake_hwclock_datafile() -> str:
 
 
 def get_system_time_utc() -> datetime:
-    return datetime.datetime.utcnow()
+    return datetime.datetime.now(dateutil.tz.tzutc())
 
 
 def get_system_time_local() -> datetime:
-    return get_system_time_utc().replace(tzinfo=dateutil.tz.tzlocal())
+    return get_system_time_utc().astimezone(dateutil.tz.tzlocal())
 
 
 def is_system_time_ready() -> bool:
@@ -82,9 +83,8 @@ def is_system_time_ready() -> bool:
     if len(fake_hwclock_datafile) > 0:
         # fake_hwclock data is stored in UTC format, data e.g: 2022-10-15 04:30:35
         with open(fake_hwclock_datafile, 'r') as fd:
-            # output = fd.read().strip()
-            fake_hwclock_datetime = datetime.datetime.strptime(fd.read().strip() + '+0', '%Y-%m-%d %H:%M:S%z')
-            write_log("fake_hwclock_datetime: " + str(fake_hwclock_datetime))
+            fake_hwclock_datetime = datetime.datetime.strptime(fd.read().strip(), '%Y-%m-%d %H:%M:%S').replace(tzinfo=dateutil.tz.tzutc())
+            # write_log("Loaded fake_hwclock: " + str(fake_hwclock_datetime))
         if get_system_time_utc() > fake_hwclock_datetime:
             return True
         else:
@@ -122,7 +122,7 @@ def exec_system_reboot():
 
 
 def is_next_day(__prev_date_local: datetime) -> bool:
-    if get_system_time_local().date() - __prev_date_local().date() > 0:
+    if (get_system_time_local().date() - __prev_date_local.date()).days > 0:
         return True
     else:
         return False
@@ -134,26 +134,32 @@ if __name__ == '__main__':
         write_log("Waiting system time be ready...")
         time.sleep(LOOP_DELAY_SECOND)
 
+    write_log("System time is ready")
     prev_datetime_local = get_system_time_local()
-    tmp_dt = datetime.datetime.strptime(SYSTEM_REBOOT_LOCAL_TIME_H_M_S, '%H:%M:%S')
+    tmp_dt = datetime.datetime.strptime(SYSTEM_REBOOT_SCHEDULED_LOCAL_TIME, '%H:%M:%S')
     reboot_scheduled_datetime_local = get_system_time_local().replace(hour=tmp_dt.hour, minute=tmp_dt.minute, second=tmp_dt.second)
 
     while True:
         system_local_time = get_system_time_local()
         max_elapsed_local_time = system_local_time + datetime.timedelta(seconds=10)
 
-        write_log("Loop...")
-        write_log("system_local_time: " + str(system_local_time))
-        write_log("max_elapsed_local_time: " + str(max_elapsed_local_time))
+        if is_next_day(prev_datetime_local):
+            reboot_scheduled_datetime_local += datetime.timedelta(days=1)
+            prev_datetime_local = get_system_time_local()
+            # write_log("reboot_scheduled_datetime_local is updated")
 
-        if reboot_scheduled_datetime_local < system_local_time < max_elapsed_local_time:
-            # exec_system_reboot()
-            write_log("exec_system_reboot")
+        # write_log("Loop...")
+        # write_log("system_local_time: " + str(system_local_time))
+        # write_log("max_elapsed_local_time: " + str(max_elapsed_local_time))
+        # write_log("reboot_scheduled_datetime_local: " + str(reboot_scheduled_datetime_local))
+        # write_log("prev_datetime_local: " + str(prev_datetime_local))
+
+        # if reboot_scheduled_datetime_local < system_local_time < max_elapsed_local_time:
+        if system_local_time < reboot_scheduled_datetime_local < max_elapsed_local_time:
+            write_log("Rebooting system...")
+            exec_system_reboot()
             time.sleep(20)
 
-        if is_next_day(prev_datetime_local):
-            max_elapsed_local_time.replace(day=system_local_time.day)
-
-        write_log("Current time: " + str(get_system_time_utc()))
+        # write_log("Current time: " + str(get_system_time_local()))
         time.sleep(LOOP_DELAY_SECOND)
 
