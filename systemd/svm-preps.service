@@ -1,0 +1,12 @@
+[Unit]
+Description=svm system preparations
+Before=basic.target
+After=local-fs.target sysinit.target
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+ExecStart=/opt/svm-tools/svm-system-preps.sh
+
+[Install]
+WantedBy=basic.target

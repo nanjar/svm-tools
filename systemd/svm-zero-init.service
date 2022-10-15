@@ -1,0 +1,10 @@
+[Unit]
+Description=Service to initialize smart vending machine from zero
+Requires=svm-preps.target network.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/svm-tools/svm-zero-init.sh
+
+[Install]
+WantedBy=multi-user.target

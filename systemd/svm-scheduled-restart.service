@@ -1,0 +1,14 @@
+[Unit]
+Description=Service to scheduled restart for smartvending system
+
+[Service]
+Type=simple
+ExecStart=/opt/svm-tools/svm-scheduled-restart.sh
+TimeoutSec=30
+RestartSec=15s
+Restart=always
+User=pi
+Group=pi
+
+[Install]
+WantedBy=multi-user.target
