@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_NAME="svm-scheduled-restart"
-
+PYPCKGS_PATH="/smartvending/pypackages/"
 ENV_NAME="asset-$SCRIPT_NAME/env"
 CALLER_DIR="$PWD"
 PY_BASE_DIR=$(readlink -f $0 | xargs dirname)/py
@@ -14,7 +14,7 @@ if [ ! -d "$ENV_DIR" ]; then
   source $ENV_DIR/bin/activate
   echo "Installing necessary packages..."
   cd $PY_BASE_DIR
-  pip3 install -r "asset-$SCRIPT_NAME"/requirements.txt
+  pip3 install --find-links "$PYPCKGS_PATH" -r "asset-$SCRIPT_NAME"/requirements.txt
   deactivate
   sudo lock-system
   cd $CALLER_DIR

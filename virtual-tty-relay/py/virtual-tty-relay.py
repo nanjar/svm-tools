@@ -1,11 +1,13 @@
 import os
 import pty
+import tty
+import time
 import serial
 import threading
-import time
-import tty
+import datetime
 import termios
 import queue
+
 
 # Comm direction: shakecontroller <=> src0 <=> tty <=> device
 #                 virtual_button   -> src1  -> src0 (emulate button event from machine) -> shakecontroller
@@ -76,12 +78,17 @@ def write_log(message: str):
     global LOG_PATH
     global IS_LOG_ENABLE
     global __lock_log
-    
+
     __lock_log.acquire()
     if IS_LOG_ENABLE:
+        if time.daylight:
+            system_tz = datetime.timezone(datetime.timedelta(seconds=-time.altzone), time.tzname[1])
+        else:
+            system_tz = datetime.timezone(datetime.timedelta(seconds=-time.timezone), time.tzname[0])
+
         with open(LOG_PATH, "a") as fd:
-            fd.write(str(datetime.now(self.__system_tz()).isoformat(sep=' ', timespec='milliseconds')) + ' [DEBUG]: [VirtualTTY] ' + str(message) + '\r\n')
-    __lock_log.release()
+            fd.write(str(datetime.datetime.now(system_tz).isoformat(sep=' ', timespec='milliseconds')) + ' [DEBUG]: [VirtualTTY] ' + str(message) + '\r\n')
+    __lock_log.release()    
     
 
 if __name__ == '__main__':
