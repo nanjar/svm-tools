@@ -3,8 +3,10 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Update cron job from cron_task to system
 #
-# hesaputra@2021
+# hesaputra@2022
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
-crontab -u pi /opt/svm-tools/cron/cron_task
+sudo unlock-system
+crontab -u pi /opt/svm-tools/config/cron/cron_task
+sudo lock-system
 sudo systemctl restart cron.service

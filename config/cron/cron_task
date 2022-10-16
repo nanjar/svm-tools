@@ -1,6 +1,3 @@
 # Begin Whenever generated tasks for: /smartvending/server/config/schedule.rb at: 2022-01-06 09:54:22 +0700
 0,5,10,15,20,25,30,35,40,45,50,55 * * * * /bin/bash -l -c 'cd /smartvending/server && RAILS_ENV=production bundle exec rake healthcheck:queue --silent'
 # End Whenever generated tasks for: /smartvending/server/config/schedule.rb at: 2022-01-06 09:54:22 +0700
-
-# Scheduled restart job
-30 2 * * * sleep 77 && /usr/bin/flock -n /tmp/svm-scheduled-restart.lockfile /opt/svm-tools/svm-scheduled-restart.sh

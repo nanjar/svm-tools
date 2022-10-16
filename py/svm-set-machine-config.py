@@ -29,7 +29,7 @@ TIME_CHECKING_INTERNET = 3.0
 TIME_CHECKING_WIFI = 3.0
 TIME_CHECKING_TUNNEL_IP = 3.0
 
-VERBOSE_LOGFILE: str = '/home/pi/svm-set-machine-config.log'
+VERBOSE_LOGFILE: str = '/var/log/smartvending/system/svm-set-machine-config.log'
 INTERNET_URL: str = '8.8.8.8'
 IMG_PATH: str = '/opt/svm-tools/py/asset-svm-set-machine-config/img'
 GIF_GEAR_ANIME_PATH: str = IMG_PATH + '/gear-anime/'
