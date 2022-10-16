@@ -828,11 +828,6 @@ def task_tk_window():
     gif_gear_anime = Label(canvas, image=img_gif_anime_frame[img_gif_anime_frame_index], borderwidth=0)
     gif_gear_anime.place(x=1450, y=670)
 
-    if has_svmid_set():
-        handler_btn_continue['state'] = 'normal'
-    else:
-        handler_btn_continue['state'] = 'disabled'
-
 
 def task_play_gif_gear():
     global player_gif_gear
@@ -855,6 +850,11 @@ if __name__ == '__main__':
 
     print_verbose('Loading task_check_svmid...')
     threading.Thread(target=task_check_svmid, daemon=True).start()
+
+    if has_svmid_set():
+        handler_btn_continue['state'] = 'normal'
+    else:
+        handler_btn_continue['state'] = 'disabled'
 
     tk_window.mainloop()
 

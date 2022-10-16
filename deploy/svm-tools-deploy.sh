@@ -7,7 +7,7 @@
 # hesaputra@2022
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
-sudo unlock-system -p
+sudo unlock-system
 
 # Deploy to /usr/bin
 sudo ln -sf /opt/svm-tools/svm-update.sh /usr/bin/svm-update
@@ -20,20 +20,25 @@ sudo ln -sf /opt/svm-tools/virtual-button/virtual-button.sh /usr/bin/virtual-but
 sudo ln -sf /opt/svm-tools/svm-show-maintenance-image.sh /usr/bin/show-maintenance
 
 # Install env variable
-sudo ln -s /opt/svm-tools/config/env-variable/svm-env.sh /etc/profile.d/svm-env.sh
+sudo ln -sf /opt/svm-tools/config/env-variable/svm-env.sh /etc/profile.d/svm-env.sh
 
 # Install services
+sudo unlock-system
 sudo cp -f /opt/svm-tools/config/systemd/svm-zero-init.service /etc/systemd/system/
 sudo systemctl enable svm-zero-init.service
 
+sudo unlock-system
 sudo cp -f /opt/svm-tools/config/systemd/svm-preps.service /etc/systemd/system/
 sudo systemctl enable svm-preps.service
 
+sudo unlock-system
 sudo cp -f /opt/svm-tools/config/systemd/fake-hwclock.service /etc/systemd/system/
 sudo systemctl enable fake-hwclock.service
 
+sudo unlock-system
 sudo cp -f /opt/svm-tools/config/systemd/svm-scheduled-restart.service /etc/systemd/system/
 sudo systemctl enable svm-scheduled-restart.service
+
 sudo systemctl daemon-reload
 sudo lock-system
 
