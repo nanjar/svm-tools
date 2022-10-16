@@ -633,7 +633,6 @@ def set_wpa(wpa_no: str) -> bool:
     return success
 
 
-
 def task_set_svm_id():
     global buffer_process_svmid
     global run_task_set_vmid
@@ -642,8 +641,12 @@ def task_set_svm_id():
         if len(buffer_process_svmid) > 0:
             if set_vpn(buffer_process_svmid):
                 buffer_process_svmid = ''
+                # If succeeded, enable continue button
+                handler_btn_continue['state'] = 'normal'
             else:
                 buffer_process_svmid = ''
+                # If failed, disable continue button
+                handler_btn_continue['state'] = 'disabled'
         time.sleep(1)
 
 
@@ -812,10 +815,7 @@ def task_tk_window():
 
     handler_btn_continue.bind("<ButtonPress>", lambda event: event_button_continue_pressed())
     handler_btn_continue.bind("<ButtonRelease>", lambda event: event_button_continue_released())
-    
-    # Initialise at disabled state
-    handler_btn_continue['state'] = 'disabled'
-    
+
     create_ui_set_vmid(canvas, BACKGROUND_COLOR)
     create_ui_activate_wifi(canvas, BACKGROUND_COLOR)
     create_ui_status(canvas, BACKGROUND_COLOR)
