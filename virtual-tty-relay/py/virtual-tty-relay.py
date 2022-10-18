@@ -93,7 +93,7 @@ def write_log(message: str):
 
 if __name__ == '__main__':
     if os.environ.get(LOG_PATH_ENV_NAME) is not None and len(os.environ.get(LOG_PATH_ENV_NAME)) > 0:
-        LOG_PATH = os.environ.get(LOG_PATH_ENV_NAME))
+        LOG_PATH = os.environ.get(LOG_PATH_ENV_NAME)
         
     if os.environ.get(LOG_ENABLE_ENV_NAME) is not None and os.environ.get(LOG_ENABLE_ENV_NAME).lower() == 'true':
         IS_LOG_ENABLE = True       
