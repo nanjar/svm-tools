@@ -28,14 +28,14 @@ sudo ln -sf /opt/svm-tools/config/bash-completion/completion-svm-tools.sh /etc/b
 # Install services
 sudo unlock-system
 sudo cp -f /opt/svm-tools/config/systemd/svm-zero-init.service /etc/systemd/system/
-sudo systemctl enable svm-zero-init.service
+# sudo systemctl enable svm-zero-init.service
 
 sudo cp -f /opt/svm-tools/config/systemd/virtual-tty-relay.service /etc/systemd/system/
-sudo systemctl enable virtual-tty-relay.service
+# sudo systemctl enable virtual-tty-relay.service
 
 sudo unlock-system
 sudo cp -f /opt/svm-tools/config/systemd/svm-preps.service /etc/systemd/system/
-sudo systemctl enable svm-preps.service
+# sudo systemctl enable svm-preps.service
 
 sudo unlock-system
 sudo cp -f /opt/svm-tools/config/systemd/fake-hwclock.service /etc/systemd/system/
@@ -43,7 +43,7 @@ sudo systemctl enable fake-hwclock.service
 
 sudo unlock-system
 sudo cp -f /opt/svm-tools/config/systemd/svm-scheduled-restart.service /etc/systemd/system/
-sudo systemctl enable svm-scheduled-restart.service
+# sudo systemctl enable svm-scheduled-restart.service
 
 sudo systemctl daemon-reload
 sudo lock-system

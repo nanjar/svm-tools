@@ -88,6 +88,7 @@ list_all_services: List[str] = \
         'rabbitmq-server.service',
         'rabbit-consumer.service',
         'virtual-tty-relay.service',
+        'svm-scheduled-restart.service',
         'pyshake.service',
         'pm2-pi.service'
     ]
