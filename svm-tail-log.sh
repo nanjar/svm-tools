@@ -4,9 +4,11 @@ LOG_PATH=""
 if [ $1 == "production" ]; then
     LOG_PATH="/var/log/smartvending/server/production.log"
 elif [ $1 == "rabbit-consumer" ]; then
-    LOG_PATH="/var/log/smartvending/server/rabbit-consumer.log"
+    LOG_PATH="/var/log/smartvending/server/rabbitmq-consumer.log"
 elif [ $1 == "veritrans" ]; then
     LOG_PATH="/var/log/smartvending/server/veritrans.log"
+elif [ $1 == "ui" ]; then
+    LOG_PATH="/var/log/smartvending/server/ui.log"    
 elif [ $1 == "controller" ]; then
     LOG_PATH="/var/log/smartvending/controller/indoshakecontroller.log"
 elif [ $1 == "virtual-tty" ]; then
