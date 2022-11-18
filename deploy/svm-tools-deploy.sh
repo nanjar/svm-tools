@@ -35,10 +35,10 @@ sudo systemctl enable svm-zero-init.service
 sudo systemctl enable svm-preps.service
 
 sudo cp -f /opt/svm-tools/config/systemd/virtual-tty-relay.service /etc/systemd/system/
-# sudo systemctl enable virtual-tty-relay.service
+sudo systemctl enable virtual-tty-relay.service
 
 sudo cp -f /opt/svm-tools/config/systemd/svm-scheduled-restart.service /etc/systemd/system/
-# sudo systemctl enable svm-scheduled-restart.service
+sudo systemctl enable svm-scheduled-restart.service
 
 sudo systemctl daemon-reload
 sudo lock-system
