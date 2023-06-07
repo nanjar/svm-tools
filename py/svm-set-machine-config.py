@@ -4,7 +4,7 @@ import time
 import subprocess
 from tkinter import *
 import PIL
-from PIL import ImageTk
+from PIL import Image, ImageTk
 import tkinter.font
 import signal
 from cryptography.fernet import Fernet
@@ -32,6 +32,7 @@ TIME_CHECKING_TUNNEL_IP = 3.0
 VERBOSE_LOGFILE: str = '/var/log/smartvending/system/svm-set-machine-config.log'
 INTERNET_URL: str = '8.8.8.8'
 IMG_PATH: str = '/opt/svm-tools/py/asset-svm-set-machine-config/img'
+#IMG_PATH: str = 'asset-svm-set-machine-config/img'
 GIF_GEAR_ANIME_PATH: str = IMG_PATH + '/gear-anime/'
 
 img_background = None
@@ -151,15 +152,22 @@ def get_ip_address(interface_name: str) -> str:
     return ip_address
 
 
-def create_ui_set_vmid(parent: tkinter, window_color: str):
+def create_ui_set_vmid(parent: tkinter, window_color: str, screen_width_ratio: float, screen_height_ratio: float):
     global img_holder
     global textbox_userinput_set_svmid
     global handler_btn_numpad
 
-    btn_data: dict = {'set': [510, 260, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-pressed.png')], '1': [127, 390, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-1.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-1-pressed.png')], '2': [326, 390, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-2.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-2-pressed.png')], '3': [525, 390, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-3.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-3-pressed.png')],
-                      '4': [127, 516, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-4.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-4-pressed.png')], '5': [326, 516, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-5.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-5-pressed.png')], '6': [525, 516, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-6.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-6-pressed.png')], '7': [127, 642, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-7.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-7-pressed.png')],
-                      '8': [326, 642, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-8.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-8-pressed.png')], '9': [525, 642, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-9.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-9-pressed.png')], '0': [425, 770, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-0.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-0-pressed.png')], 'clear': [126, 770, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-clear.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-clear-pressed.png')]}
     # [button_type] = {[x, y, image_button, image_button_pressed]}
+    # btn_data: dict = {'set': [510, 260, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-pressed.png')], '1': [127, 390, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-1.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-1-pressed.png')], '2': [326, 390, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-2.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-2-pressed.png')], '3': [525, 390, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-3.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-3-pressed.png')],
+    #                   '4': [127, 516, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-4.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-4-pressed.png')], '5': [326, 516, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-5.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-5-pressed.png')], '6': [525, 516, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-6.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-6-pressed.png')], '7': [127, 642, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-7.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-7-pressed.png')],
+    #                   '8': [326, 642, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-8.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-8-pressed.png')], '9': [525, 642, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-9.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-9-pressed.png')], '0': [425, 770, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-0.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-0-pressed.png')], 'clear': [126, 770, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-clear.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-clear-pressed.png')]}
+
+    btn_data: dict = {'set': [510/screen_width_ratio, 260/screen_height_ratio, open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-pressed.png', screen_width_ratio, screen_height_ratio)], '1': [127/screen_width_ratio, 390/screen_height_ratio, open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-1.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-1-pressed.png', screen_width_ratio, screen_height_ratio)],
+                      '2': [326/screen_width_ratio, 390/screen_height_ratio, open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-2.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-2-pressed.png', screen_width_ratio, screen_height_ratio)], '3': [525/screen_width_ratio, 390/screen_height_ratio, open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-3.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-3-pressed.png', screen_width_ratio, screen_height_ratio)],
+                      '4': [127/screen_width_ratio, 516/screen_height_ratio, open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-4.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-4-pressed.png', screen_width_ratio, screen_height_ratio)], '5': [326/screen_width_ratio, 516/screen_height_ratio, open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-5.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-5-pressed.png', screen_width_ratio, screen_height_ratio)],
+                      '6': [525/screen_width_ratio, 516/screen_height_ratio, open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-6.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-6-pressed.png', screen_width_ratio, screen_height_ratio)], '7': [127/screen_width_ratio, 642/screen_height_ratio, open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-7.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-7-pressed.png', screen_width_ratio, screen_height_ratio)],
+                      '8': [326/screen_width_ratio, 642/screen_height_ratio, open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-8.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-8-pressed.png', screen_width_ratio, screen_height_ratio)], '9': [525/screen_width_ratio, 642/screen_height_ratio, open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-9.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-9-pressed.png', screen_width_ratio, screen_height_ratio)],
+                      '0': [425/screen_width_ratio, 770/screen_height_ratio, open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-0.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-0-pressed.png', screen_width_ratio, screen_height_ratio)], 'clear': [126/screen_width_ratio, 770/screen_height_ratio, open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-clear.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-svmid-numpad-clear-pressed.png', screen_width_ratio, screen_height_ratio)]}
 
     for btn_key in btn_data:
         btn_obj = Button(parent, image=btn_data[btn_key][2], borderwidth=0, activeforeground=window_color, activebackground=window_color)
@@ -168,31 +176,31 @@ def create_ui_set_vmid(parent: tkinter, window_color: str):
         btn_obj.bind("<ButtonRelease>", lambda event, numpad_button_type=btn_key: event_button_numpad_released(numpad_button_type))
         handler_btn_numpad[btn_key] = [btn_obj, btn_data[btn_key][2], btn_data[btn_key][3]]
 
-    img_textbox_set_vmid = PhotoImage(file=IMG_PATH + '/textbox-set-vmid.png')
-    img_label_set_vmid = PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/label-set-svmid.png')
+    img_textbox_set_vmid = open_image_with_ratio(IMG_PATH + '/textbox-set-vmid.png', screen_width_ratio, screen_height_ratio)
+    img_label_set_vmid = open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/label-set-svmid.png', screen_width_ratio, screen_height_ratio)
 
-    Label(parent, image=img_textbox_set_vmid, borderwidth=0, activeforeground=window_color, activebackground=window_color).place(x=130, y=275)
-    Label(parent, image=img_label_set_vmid, borderwidth=0, activeforeground=window_color, activebackground=window_color).place(x=130, y=195)
+    Label(parent, image=img_textbox_set_vmid, borderwidth=0, activeforeground=window_color, activebackground=window_color).place(x=130/screen_width_ratio, y=275/screen_height_ratio)
+    Label(parent, image=img_label_set_vmid, borderwidth=0, activeforeground=window_color, activebackground=window_color).place(x=130/screen_width_ratio, y=195/screen_height_ratio)
 
-    font_userinput = tkinter.font.Font(family='Helvetica', size=50, weight='bold')
+    font_userinput = tkinter.font.Font(family='Helvetica', size=int(50/screen_width_ratio), weight='bold')
     textbox_userinput_set_svmid = Label(parent, font=font_userinput, text='', borderwidth=0, bg='#FFFFFF')
-    textbox_userinput_set_svmid.place(x=170, y=280)
+    textbox_userinput_set_svmid.place(x=170/screen_width_ratio, y=280/screen_height_ratio)
 
     # Holding image files so it wont be cleaned up by garbage collector
     img_holder.append(img_label_set_vmid)
     img_holder.append(img_textbox_set_vmid)
 
 
-def create_ui_activate_wifi(parent: tkinter, window_color: str):
+def create_ui_activate_wifi(parent: tkinter, window_color: str, screen_width_ratio: float, screen_height_ratio: float):
     global img_holder
     global handler_btn_wifi
 
-    btn_data: dict = {'1': [900, 260, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-1.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-1.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-1-pressed.png')], '2': [1099, 260, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-2.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-2.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-2-pressed.png')],
-                      '3': [1298, 260, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-3.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-3.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-3-pressed.png')], '4': [1497, 260, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-4.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-4.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-4-pressed.png')],
-                      '5': [900, 386, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-5.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-5.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-5-pressed.png')], '6': [1099, 386, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-6.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-6.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-6-pressed.png')],
-                      '7': [1298, 386, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-7.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-7.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-7-pressed.png')], '8': [1497, 386, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-8.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-8.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-8-pressed.png')],
-                      '9': [900, 512, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-9.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-9.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-9-pressed.png')], '10': [1099, 512, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-10.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-10.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-10-pressed.png')],
-                      '11': [1298, 512, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-11.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-11.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-11-pressed.png')], '12': [1497, 512, PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-12.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-12.png'), PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-12-pressed.png')]}
+    btn_data: dict = {'1': [900/screen_width_ratio, 260/screen_height_ratio, open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-1.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-1.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-1-pressed.png', screen_width_ratio, screen_height_ratio)], '2': [1099/screen_width_ratio, 260/screen_height_ratio, open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-2.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-2.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-2-pressed.png', screen_width_ratio, screen_height_ratio)],
+                      '3': [1298/screen_width_ratio, 260/screen_height_ratio, open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-3.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-3.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-3-pressed.png', screen_width_ratio, screen_height_ratio)], '4': [1497/screen_width_ratio, 260/screen_height_ratio, open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-4.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-4.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-4-pressed.png', screen_width_ratio, screen_height_ratio)],
+                      '5': [900/screen_width_ratio, 386/screen_height_ratio, open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-5.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-5.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-5-pressed.png', screen_width_ratio, screen_height_ratio)], '6': [1099/screen_width_ratio, 386/screen_height_ratio, open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-6.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-6.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-6-pressed.png', screen_width_ratio, screen_height_ratio)],
+                      '7': [1298/screen_width_ratio, 386/screen_height_ratio, open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-7.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-7.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-7-pressed.png', screen_width_ratio, screen_height_ratio)], '8': [1497/screen_width_ratio, 386/screen_height_ratio, open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-8.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-8.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-8-pressed.png', screen_width_ratio, screen_height_ratio)],
+                      '9': [900/screen_width_ratio, 512/screen_height_ratio, open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-9.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-9.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-9-pressed.png', screen_width_ratio, screen_height_ratio)], '10': [1099/screen_width_ratio, 512/screen_height_ratio, open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-10.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-10.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-10-pressed.png', screen_width_ratio, screen_height_ratio)],
+                      '11': [1298/screen_width_ratio, 512/screen_height_ratio, open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-11.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-11.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-11-pressed.png', screen_width_ratio, screen_height_ratio)], '12': [1497/screen_width_ratio, 512/screen_height_ratio, open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-on-profile-12.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-off-profile-12.png', screen_width_ratio, screen_height_ratio), open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-set-wifi-profile-12-pressed.png', screen_width_ratio, screen_height_ratio)]}
     # [button_type] = {[x, y, image_wifi_on, image_wifi_off, image_wifi_pressed]}
 
     for btn_key in btn_data:
@@ -203,32 +211,32 @@ def create_ui_activate_wifi(parent: tkinter, window_color: str):
         handler_btn_wifi[btn_key] = [btn_obj, btn_data[btn_key][2], btn_data[btn_key][3], btn_data[btn_key][4]]
 
     # Label
-    img_label_activate_wifi = PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/label-activate-wifi.png')
-    tkinter.Label(parent, image=img_label_activate_wifi, borderwidth=0, activeforeground=window_color, activebackground=window_color).place(x=900, y=195)
+    img_label_activate_wifi = open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/label-activate-wifi.png', screen_width_ratio, screen_height_ratio)
+    tkinter.Label(parent, image=img_label_activate_wifi, borderwidth=0, activeforeground=window_color, activebackground=window_color).place(x=900/screen_width_ratio, y=195/screen_height_ratio)
     img_holder.append(img_label_activate_wifi)
 
 
-def create_ui_status(parent: tkinter, window_color: str):
-    img_label_status = PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/label-status.png')
-    Label(parent, image=img_label_status, borderwidth=0, activeforeground=window_color, activebackground=window_color).place(x=900, y=680)
+def create_ui_status(parent: tkinter, window_color: str, screen_width_ratio: float, screen_height_ratio: float):
+    img_label_status = open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/label-status.png', screen_width_ratio, screen_height_ratio)
+    Label(parent, image=img_label_status, borderwidth=0, activeforeground=window_color, activebackground=window_color).place(x=900/screen_width_ratio, y=680/screen_height_ratio)
 
-    img_icon_status_success = PhotoImage(file=IMG_PATH + '/icon-success.png')
-    img_icon_status_fail = PhotoImage(file=IMG_PATH + '/icon-fail.png')
-    font_label_status = tkinter.font.Font(family='Helvetica', size=25, weight='normal')
+    img_icon_status_success = open_image_with_ratio(IMG_PATH + '/icon-success.png', screen_width_ratio, screen_height_ratio)
+    img_icon_status_fail = open_image_with_ratio(IMG_PATH + '/icon-fail.png', screen_width_ratio, screen_height_ratio)
+    font_label_status = tkinter.font.Font(family='Helvetica', size=int(25/screen_width_ratio), weight='normal')
 
     icon_status1 = Label(parent, font=font_label_status, image=img_icon_status_fail)
-    icon_status1.place(x=900, y=740)
+    icon_status1.place(x=900/screen_width_ratio, y=740/screen_height_ratio)
     label_status1 = Label(parent, font=font_label_status, text="SVM id:")
-    label_status1.place(x=950, y=743)
+    label_status1.place(x=950/screen_width_ratio, y=743/screen_height_ratio)
     label_status_value1 = Label(parent, font=font_label_status, text="tidak ada")
-    label_status_value1.place(x=1090, y=743)
+    label_status_value1.place(x=1090/screen_width_ratio, y=743/screen_height_ratio)
 
     icon_status2 = Label(parent, font=font_label_status, image=img_icon_status_fail)
-    icon_status2.place(x=900, y=780)
+    icon_status2.place(x=900/screen_width_ratio, y=780/screen_height_ratio)
     label_status2 = Label(parent, font=font_label_status, text="Koneksi ke wifi:")
-    label_status2.place(x=950, y=783)
+    label_status2.place(x=950/screen_width_ratio, y=783/screen_height_ratio)
     label_status_value2 = Label(parent, font=font_label_status, text="tidak ada")
-    label_status_value2.place(x=1220, y=783)
+    label_status_value2.place(x=1220/screen_width_ratio, y=783/screen_height_ratio)
 
     handler_label_status_data['status_val1'] = [icon_status1, img_icon_status_success, img_icon_status_fail, label_status_value1]
     handler_label_status_data['status_val2'] = [icon_status2, img_icon_status_success, img_icon_status_fail, label_status_value2]
@@ -777,6 +785,30 @@ def task_check_wifi_connection():
             time.sleep(2)
 
 
+def get_display_size():
+    root = tkinter.Tk()
+    root.update_idletasks()
+    root.attributes('-fullscreen', True)
+    root.state('iconic')
+    height = root.winfo_screenheight()
+    width = root.winfo_screenwidth()
+    root.destroy()
+    return width, height
+
+
+def open_image(image_path: str, width=None, height=None) -> PhotoImage:
+    if width is not None and height is not None:
+        img = Image.open(image_path)
+        return ImageTk.PhotoImage(img.resize((width, height), Image.ANTIALIAS))
+    else:
+        return PhotoImage(file=image_path)
+
+
+def open_image_with_ratio(image_path: str, width_ratio: float, height_ratio: float) -> PhotoImage:
+    img = Image.open(image_path)
+    return ImageTk.PhotoImage(img.resize((int(img.width/width_ratio), int(img.height/height_ratio)), Image.ANTIALIAS))
+
+
 def task_tk_window():
     global tk_window
     global img_background
@@ -790,43 +822,60 @@ def task_tk_window():
     global gif_canvas_img
     
     BACKGROUND_COLOR = '#D6D6D6'
-    WINDOW_WIDTH = '1920'
-    WINDOW_HEIGHT = '1080'
+    WINDOW_WIDTH = 1920
+    WINDOW_HEIGHT = 1080
 
-    tk_window.geometry(WINDOW_WIDTH + 'x' + WINDOW_HEIGHT)
+    screen_real_size = get_display_size()
+    screen_real_width = screen_real_size[0]
+    screen_real_height = screen_real_size[1]
+
+    screen_width_ratio = WINDOW_WIDTH / screen_real_width
+    screen_height_ratio = WINDOW_HEIGHT / screen_real_height
+
+    # print("screen_ratio_width:", screen_width_ratio)
+    # print("screen_ratio_height:", screen_height_ratio)
+
+    tk_window.geometry(str(screen_real_width) + 'x' + str(screen_real_height))
     tk_window.bind('<Escape>', event_btn_pressed_esc)
     tk_window.attributes("-fullscreen", True)
     tk_window.wm_attributes("-topmost", True)
-    tk_window.wm_overrideredirect(True)
+    # tk_window.wm_overrideredirect(True)
     tk_window.focus_set()
 
-    img_background = PhotoImage(file=IMG_PATH + '/background.png')
-    canvas = tkinter.Canvas(tk_window, width=WINDOW_WIDTH, height=WINDOW_HEIGHT, highlightthickness=0, bg=BACKGROUND_COLOR)
+    # img_background = PhotoImage(file=IMG_PATH + '/background.png')
+    img_background = open_image_with_ratio(IMG_PATH + '/background.png', screen_width_ratio, screen_height_ratio)
+    # img_background = img_background.zoom(int(screen_ratio_width), int(screen_ratio_height))
+    # canvas = tkinter.Canvas(tk_window, width=WINDOW_WIDTH, height=WINDOW_HEIGHT, highlightthickness=0, bg=BACKGROUND_COLOR)
+    canvas = tkinter.Canvas(tk_window, width=screen_real_width, height=screen_real_height, highlightthickness=0, bg=BACKGROUND_COLOR)
     canvas.create_image(0, 0, anchor=NW, image=img_background)
     canvas.place(x=0, y=0)
 
-    img_label_title_configuration = PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/label-title-configuration.png')
-    Label(canvas, image=img_label_title_configuration, borderwidth=0, activeforeground=BACKGROUND_COLOR, activebackground=BACKGROUND_COLOR).place(x=706, y=65)
+    # img_label_title_configuration = PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/label-title-configuration.png')
+    img_label_title_configuration = open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/label-title-configuration.png', screen_width_ratio, screen_height_ratio)
+    Label(canvas, image=img_label_title_configuration, borderwidth=0, activeforeground=BACKGROUND_COLOR, activebackground=BACKGROUND_COLOR).place(x=706/screen_width_ratio, y=65/screen_height_ratio)
 
-    img_btn_continue = PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-page-continue.png')
-    img_btn_continue_pressed = PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-page-continue-pressed.png')
+    # img_btn_continue = PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-page-continue.png')
+    img_btn_continue = open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-page-continue.png', screen_width_ratio, screen_height_ratio)
+    # img_btn_continue_pressed = PhotoImage(file=IMG_PATH + '/' + LANGUAGE + '/btn-page-continue-pressed.png')
+    img_btn_continue_pressed = open_image_with_ratio(IMG_PATH + '/' + LANGUAGE + '/btn-page-continue-pressed.png', screen_width_ratio, screen_height_ratio)
     handler_btn_continue = Button(canvas, image=img_btn_continue, borderwidth=0, activeforeground=BACKGROUND_COLOR, activebackground=BACKGROUND_COLOR)
-    handler_btn_continue.place(x=1600, y=30)
+    handler_btn_continue.place(x=1600/screen_width_ratio, y=30/screen_height_ratio)
 
     handler_btn_continue.bind("<ButtonPress>", lambda event: event_button_continue_pressed())
     handler_btn_continue.bind("<ButtonRelease>", lambda event: event_button_continue_released())
 
-    create_ui_set_vmid(canvas, BACKGROUND_COLOR)
-    create_ui_activate_wifi(canvas, BACKGROUND_COLOR)
-    create_ui_status(canvas, BACKGROUND_COLOR)
+    create_ui_set_vmid(canvas, BACKGROUND_COLOR, screen_width_ratio, screen_height_ratio)
+    create_ui_activate_wifi(canvas, BACKGROUND_COLOR, screen_width_ratio, screen_height_ratio)
+    create_ui_status(canvas, BACKGROUND_COLOR, screen_width_ratio, screen_height_ratio)
 
     signal.signal(signal.SIGINT, sigint_handler)
 
     for frame in range(1, 204):
-        img_gif_anime_frame.append(PIL.ImageTk.PhotoImage(file=GIF_GEAR_ANIME_PATH + '%04d.png' % frame, format='png'))
+        # img_gif_anime_frame.append(PIL.ImageTk.PhotoImage(file=GIF_GEAR_ANIME_PATH + '%04d.png' % frame, format='png'))
+        img_gif_anime_frame.append(open_image_with_ratio(GIF_GEAR_ANIME_PATH + '%04d.png' % frame, screen_width_ratio, screen_height_ratio))
 
     gif_gear_anime = Label(canvas, image=img_gif_anime_frame[img_gif_anime_frame_index], borderwidth=0)
-    gif_gear_anime.place(x=1450, y=670)
+    gif_gear_anime.place(x=1450/screen_width_ratio, y=670/screen_height_ratio)
 
 
 def task_play_gif_gear():

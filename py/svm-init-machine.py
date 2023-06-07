@@ -17,6 +17,9 @@ IMG_PATH: str = '/opt/svm-tools/py/asset-svm-init-machine/img'
 # IMG_PATH: str = '/home/hesaputra/Desktop/smart_vending_machine/dev/deploy_svm_rootfs/rootfs/opt/svm-tools/py/asset-svm-init-machine/img'
 TITLE_TEXT: str = "MOHON TUNGGU"
 
+g_screen_width_ratio = 0
+g_screen_height_ratio = 0
+
 
 class TimerInterval(threading.Timer):
     def run(self):
@@ -25,7 +28,7 @@ class TimerInterval(threading.Timer):
 
 
 class LabelJugglingAnim:
-    def __init__(self, parent, title_text: str, x: int, y: int, spacing: int):
+    def __init__(self, parent, title_text: str, x: int, y: int, spacing: int, font_size: int):
         self.char: List[tkinter.Label] = []
         self.x: List[int] = []
         self.y: List[int] = []
@@ -33,7 +36,7 @@ class LabelJugglingAnim:
         self.y_offset_max: List[int] = []
         self.y_dir: List[int] = []
 
-        __font_title = tkinter.font.Font(family='Fixedsys', size=30, weight='normal')
+        __font_title = tkinter.font.Font(family='Fixedsys', size=font_size, weight='normal')
         index = 0
         for title_char in title_text:
             self.char.append(tkinter.Label(parent, text=title_char, borderwidth=0, font=__font_title))
@@ -102,6 +105,9 @@ def update_cmd_output_textbox(text: str):
 
 
 def start_services(list_of_services: List[str]):
+    global g_screen_width_ratio
+    global g_screen_height_ratio
+
     TOTAL_PROGRESS_BAR_ASSIGNED = 20
     single_progress_bar_val = TOTAL_PROGRESS_BAR_ASSIGNED / len(list_of_services)
 
@@ -115,13 +121,16 @@ def start_services(list_of_services: List[str]):
             update_cmd_output_textbox("Starting " + cmd + ": " + is_enabled)
 
             if is_enabled == 'active':
-                update_progressbar(int(single_progress_bar_val))
+                update_progressbar(int(single_progress_bar_val), g_screen_width_ratio, g_screen_height_ratio)
                 break
             else:
                 time.sleep(1)
 
 
 def stop_services(list_of_services: List[str]):
+    global g_screen_width_ratio
+    global g_screen_height_ratio
+
     TOTAL_PROGRESS_BAR_ASSIGNED = 20
     single_progress_bar_val = TOTAL_PROGRESS_BAR_ASSIGNED / len(list_of_services)
 
@@ -135,7 +144,7 @@ def stop_services(list_of_services: List[str]):
             update_cmd_output_textbox("Stopping " + cmd)
 
             if is_enabled == 'inactive' or is_enabled == 'failed':
-                update_progressbar(int(single_progress_bar_val))
+                update_progressbar(int(single_progress_bar_val), g_screen_width_ratio, g_screen_height_ratio)
                 break
             else:
                 time.sleep(1)
@@ -182,6 +191,9 @@ def is_wifi_tunnel_ready() -> bool:
 
 
 def cmd_purge_then_create_vendingapp_db():
+    global g_screen_width_ratio
+    global g_screen_height_ratio
+
     list_db_operations = \
         [
             #'sudo mysql -e "drop database vendingapp"',
@@ -204,19 +216,19 @@ def cmd_purge_then_create_vendingapp_db():
         except Exception as e:
             update_cmd_output_textbox(str(e).strip())
 
-        update_progressbar(int(single_progress_bar_val))
+        update_progressbar(int(single_progress_bar_val), g_screen_width_ratio, g_screen_height_ratio)
 
 
-def create_progressbar(parent):
+def create_progressbar(parent, screen_width_ratio: float, screen_height_ratio: float):
     global img_progressbar_bg
     global img_progressbar_bit
 
-    img_progressbar_bg = PIL.ImageTk.PhotoImage(file=IMG_PATH + '/progressbar-bg.jpg')
-    img_progressbar_bit = PIL.ImageTk.PhotoImage(file=IMG_PATH + '/progressbar-bit.jpg')
-    tkinter.Label(parent, image=img_progressbar_bg, borderwidth=0).place(x=1100, y=130)
+    img_progressbar_bg = open_image_with_ratio(IMG_PATH + '/progressbar-bg.jpg', screen_width_ratio, screen_height_ratio)
+    img_progressbar_bit = open_image_with_ratio(IMG_PATH + '/progressbar-bit.jpg', screen_width_ratio, screen_height_ratio)
+    tkinter.Label(parent, image=img_progressbar_bg, borderwidth=0).place(x=1100/screen_width_ratio, y=130/screen_height_ratio)
 
 
-def update_progressbar(percentage: int):
+def update_progressbar(percentage: int, screen_width_ratio: float, screen_height_ratio: float):
     global img_progressbar_bit
     global progressbar_show_index
     global progressbar_current_percent
@@ -234,7 +246,7 @@ def update_progressbar(percentage: int):
             if bar_index not in progressbar_show_index:
                 progressbar_show_index.append(bar_index)
                 if current_bar_count <= BAR_COUNT_MAX:
-                    tkinter.Label(tk_window, image=img_progressbar_bit, borderwidth=0).place(x=BAR_POSX1 + (BAR_SPACING * bar_index), y=137)
+                    tkinter.Label(tk_window, image=img_progressbar_bit, borderwidth=0).place(x=(BAR_POSX1 + (BAR_SPACING * bar_index))/screen_width_ratio, y=137/screen_height_ratio)
     except:
         # print_verbose("Exception update_progressbar:", traceback.print_exc())
         pass
@@ -243,12 +255,14 @@ def update_progressbar(percentage: int):
 def task_main():
     global list_db_services
     global list_all_services
+    global g_screen_width_ratio
+    global g_screen_height_ratio
 
     stop_services(list_all_services)
     start_services(list_db_services)
 
     wifi_tunnel_ready = is_wifi_tunnel_ready()
-    update_progressbar(10)
+    update_progressbar(10, g_screen_width_ratio, g_screen_height_ratio)
     print_verbose("Waiting wifi and tunnel: " + str(wifi_tunnel_ready))
 
     cmd_purge_then_create_vendingapp_db()
@@ -257,7 +271,7 @@ def task_main():
 
     # os.popen('sudo systemctl start pm2-pi.service').read()
     print_verbose("task_main exit.")
-    update_progressbar(10)
+    update_progressbar(10, g_screen_width_ratio, g_screen_height_ratio)
 
     exit_gui()
 
@@ -324,40 +338,69 @@ def exit_gui():
         tk_window.destroy()
 
 
+def get_display_size():
+    root = tkinter.Tk()
+    root.update_idletasks()
+    root.attributes('-fullscreen', True)
+    root.state('iconic')
+    height = root.winfo_screenheight()
+    width = root.winfo_screenwidth()
+    root.destroy()
+    return width, height
+
+
+def open_image_with_ratio(image_path: str, width_ratio: float, height_ratio: float) -> PhotoImage:
+    img = Image.open(image_path)
+    return ImageTk.PhotoImage(img.resize((int(img.width/width_ratio), int(img.height/height_ratio)), Image.ANTIALIAS))
+
+
 def task_tk_window():
     global tk_window
     global anim_title
     global global_canvas
     global img_holder
     global cmd_output_textbox
+    global g_screen_width_ratio
+    global g_screen_height_ratio
 
     BACKGROUND_COLOR = '#D6D6D6'
-    WINDOW_WIDTH = '1920'
-    WINDOW_HEIGHT = '1080'
+    WINDOW_WIDTH = 1920
+    WINDOW_HEIGHT = 1080
 
-    tk_window.geometry(WINDOW_WIDTH + 'x' + WINDOW_HEIGHT)
+    screen_real_size = get_display_size()
+    screen_real_width = screen_real_size[0]
+    screen_real_height = screen_real_size[1]
+
+    screen_width_ratio = WINDOW_WIDTH / screen_real_width
+    screen_height_ratio = WINDOW_HEIGHT / screen_real_height
+
+    g_screen_width_ratio = screen_width_ratio
+    g_screen_height_ratio = screen_height_ratio
+
+    tk_window.geometry(str(screen_real_width) + 'x' + str(screen_real_height))
     tk_window.bind('<Escape>', event_btn_pressed_esc)
     tk_window.attributes("-fullscreen", True)
     tk_window.wm_attributes("-topmost", True)
     # tk_window.wm_overrideredirect(True)
     tk_window.focus_set()
 
-    img_background = PIL.ImageTk.PhotoImage(file=IMG_PATH + '/background.jpg')
+    # img_background = PIL.ImageTk.PhotoImage(file=IMG_PATH + '/background.jpg')
+    img_background = open_image_with_ratio(IMG_PATH + '/background.jpg', screen_width_ratio, screen_real_height)
     global_canvas = tkinter.Canvas(tk_window, width=WINDOW_WIDTH, height=WINDOW_HEIGHT, highlightthickness=0, bg=BACKGROUND_COLOR)
     global_canvas.create_image(0, 0, anchor=tkinter.NW, image=img_background)
     global_canvas.place(x=0, y=0)
     img_holder.append(img_background)
 
-    font_cmd_output_textbox = tkinter.font.Font(family='Helvetica', size=18)
-    cmd_output_textbox = tkinter.scrolledtext.ScrolledText(tk_window, font=font_cmd_output_textbox, height=20, width=50, bg='white')
-    cmd_output_textbox.place(x=1100, y=300)
+    font_cmd_output_textbox = tkinter.font.Font(family='Helvetica', size=int(18/screen_width_ratio))
+    cmd_output_textbox = tkinter.scrolledtext.ScrolledText(tk_window, font=font_cmd_output_textbox, height=20/screen_width_ratio, width=50/screen_height_ratio, bg='white')
+    cmd_output_textbox.place(x=1100/screen_width_ratio, y=300/screen_height_ratio)
 
-    create_progressbar(global_canvas)
+    create_progressbar(global_canvas, screen_width_ratio, screen_height_ratio)
 
-    anim_title = LabelJugglingAnim(global_canvas, TITLE_TEXT, 1105, 70, 60)
+    anim_title = LabelJugglingAnim(global_canvas, TITLE_TEXT, int(1105/screen_width_ratio), int(70/screen_width_ratio), int(60/screen_height_ratio), int(30/screen_width_ratio))
     start_title_animation()
 
-    update_progressbar(10)
+    update_progressbar(10, screen_width_ratio, screen_height_ratio)
     time.sleep(1)
 
 
