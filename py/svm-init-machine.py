@@ -340,7 +340,7 @@ def exit_gui():
 
 def open_image_with_ratio(image_path: str, width_ratio: float, height_ratio: float) -> PhotoImage:
     img = Image.open(image_path)
-    return ImageTk.PhotoImage(img.resize((int(img.width/width_ratio), int(img.height/height_ratio)), Image.ANTIALIAS))
+    return ImageTk.PhotoImage(img.resize((int(img.width/width_ratio), int(img.height/height_ratio)), Image.Resampling.LANCZOS))
 
 
 def task_tk_window():

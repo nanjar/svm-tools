@@ -140,7 +140,7 @@ class SvmShowImage(Thread):
         # Load image
         if len(image_path) >= 0:
             try:
-                img = PIL.ImageTk.PhotoImage(Image.open(image_path))
+                img = self.__open_image(image_path, screen_width, screen_height)
                 if size_width == -1:
                     size_width = screen_width
 
@@ -211,6 +211,13 @@ class SvmShowImage(Thread):
         if self.img_window is not None:
             self.img_window.destroy()
             self.img_window = None
+
+    def __open_image(self, image_path: str, width=None, height=None) -> PhotoImage:
+        if width is not None and height is not None:
+            img = Image.open(image_path)
+            return ImageTk.PhotoImage(img.resize((width, height), Image.Resampling.LANCZOS))
+        else:
+            return PhotoImage(file=image_path)
 
 
 def sigint_handler(sig, frame):
