@@ -126,6 +126,10 @@ class SvmShowImage(Thread):
         img_window = Tk()
         img_window.bind('<Escape>', self.event_btn_pressed_esc)
         img_window.attributes("-fullscreen", True)
+
+        screen_width = img_window.winfo_screenwidth()
+        screen_height = img_window.winfo_screenheight()
+
         # Keep window on most top
         img_window.wm_attributes("-topmost", True)
         img_window.focus_set()
@@ -138,10 +142,10 @@ class SvmShowImage(Thread):
             try:
                 img = PIL.ImageTk.PhotoImage(Image.open(image_path))
                 if size_width == -1:
-                    size_width = img.width()
+                    size_width = screen_width
 
                 if size_height == -1:
-                    size_height = img.height()
+                    size_height = screen_height
 
             except Exception as e:
                 self.exit_unable_open_image(image_path)
