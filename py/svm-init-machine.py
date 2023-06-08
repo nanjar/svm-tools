@@ -3,7 +3,7 @@ import time
 import subprocess
 import threading
 import time
-import tkinter
+from tkinter import *
 import PIL
 from PIL import Image, ImageTk
 import sys
@@ -369,15 +369,14 @@ def task_tk_window():
     # tk_window.wm_overrideredirect(True)
     tk_window.focus_set()
 
-    # img_background = PIL.ImageTk.PhotoImage(file=IMG_PATH + '/background.jpg')
-    img_background = open_image_with_ratio(IMG_PATH + '/background.jpg', screen_width_ratio, screen_real_height)
-    global_canvas = tkinter.Canvas(tk_window, width=WINDOW_WIDTH, height=WINDOW_HEIGHT, highlightthickness=0, bg=BACKGROUND_COLOR)
+    img_background = open_image_with_ratio(IMG_PATH + '/background.jpg', screen_width_ratio, screen_height_ratio)
+    global_canvas = tkinter.Canvas(tk_window, width=screen_width, height=screen_height, highlightthickness=0, bg=BACKGROUND_COLOR)
     global_canvas.create_image(0, 0, anchor=tkinter.NW, image=img_background)
     global_canvas.place(x=0, y=0)
     img_holder.append(img_background)
 
     font_cmd_output_textbox = tkinter.font.Font(family='Helvetica', size=int(18/screen_width_ratio))
-    cmd_output_textbox = tkinter.scrolledtext.ScrolledText(tk_window, font=font_cmd_output_textbox, height=20/screen_width_ratio, width=50/screen_height_ratio, bg='white')
+    cmd_output_textbox = tkinter.scrolledtext.ScrolledText(tk_window, font=font_cmd_output_textbox, height=int(20/screen_width_ratio), width=int(50/screen_height_ratio), bg='white')
     cmd_output_textbox.place(x=1100/screen_width_ratio, y=300/screen_height_ratio)
 
     create_progressbar(global_canvas, screen_width_ratio, screen_height_ratio)
