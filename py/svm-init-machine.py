@@ -338,17 +338,6 @@ def exit_gui():
         tk_window.destroy()
 
 
-def get_display_size():
-    root = tkinter.Tk()
-    root.update_idletasks()
-    root.attributes('-fullscreen', True)
-    root.state('iconic')
-    height = root.winfo_screenheight()
-    width = root.winfo_screenwidth()
-    root.destroy()
-    return width, height
-
-
 def open_image_with_ratio(image_path: str, width_ratio: float, height_ratio: float) -> PhotoImage:
     img = Image.open(image_path)
     return ImageTk.PhotoImage(img.resize((int(img.width/width_ratio), int(img.height/height_ratio)), Image.ANTIALIAS))
@@ -364,22 +353,19 @@ def task_tk_window():
     global g_screen_height_ratio
 
     BACKGROUND_COLOR = '#D6D6D6'
-    WINDOW_WIDTH = 1920
-    WINDOW_HEIGHT = 1080
+    WINDOW_DEFAULT_WIDTH = 1920
+    WINDOW_DEFAULT_HEIGHT = 1080
 
-    screen_real_size = get_display_size()
-    screen_real_width = screen_real_size[0]
-    screen_real_height = screen_real_size[1]
-
-    screen_width_ratio = WINDOW_WIDTH / screen_real_width
-    screen_height_ratio = WINDOW_HEIGHT / screen_real_height
-
-    g_screen_width_ratio = screen_width_ratio
-    g_screen_height_ratio = screen_height_ratio
-
-    tk_window.geometry(str(screen_real_width) + 'x' + str(screen_real_height))
-    tk_window.bind('<Escape>', event_btn_pressed_esc)
     tk_window.attributes("-fullscreen", True)
+
+    screen_width = tk_window.winfo_screenwidth()
+    screen_height = tk_window.winfo_screenheight()
+
+    screen_width_ratio = WINDOW_DEFAULT_WIDTH / screen_width
+    screen_height_ratio = WINDOW_DEFAULT_HEIGHT / screen_height
+
+    tk_window.geometry(str(screen_width) + 'x' + str(screen_height))
+    tk_window.bind('<Escape>', event_btn_pressed_esc)
     tk_window.wm_attributes("-topmost", True)
     # tk_window.wm_overrideredirect(True)
     tk_window.focus_set()
