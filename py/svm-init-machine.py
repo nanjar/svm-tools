@@ -381,7 +381,7 @@ def task_tk_window():
 
     create_progressbar(global_canvas, screen_width_ratio, screen_height_ratio)
 
-    anim_title = LabelJugglingAnim(global_canvas, TITLE_TEXT, int(1105/screen_width_ratio), int(70/screen_width_ratio), int(60/screen_height_ratio), int(30/screen_width_ratio))
+    anim_title = LabelJugglingAnim(global_canvas, TITLE_TEXT, int(1105/screen_width_ratio), int(50/screen_width_ratio), int(60/screen_height_ratio), int(30/screen_width_ratio))
     start_title_animation()
 
     update_progressbar(10, screen_width_ratio, screen_height_ratio)
