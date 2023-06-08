@@ -215,7 +215,7 @@ class SvmShowImage(Thread):
     def __open_image(self, image_path: str, width=None, height=None) -> PhotoImage:
         if width is not None and height is not None:
             img = Image.open(image_path)
-            return ImageTk.PhotoImage(img.resize((width, height), Image.Resampling.LANCZOS))
+            return ImageTk.PhotoImage(img.resize((width, height), Image.ANTIALIAS))
         else:
             return PhotoImage(file=image_path)
 
