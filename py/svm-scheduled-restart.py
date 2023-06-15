@@ -19,7 +19,7 @@ import os
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
-SYSTEM_REBOOT_SCHEDULED_LOCAL_TIME = '02:30:00'
+SYSTEM_REBOOT_SCHEDULED_LOCAL_TIME = '02:10:00'
 WAIT_IF_UI_BUSY_SECOND = 300
 IS_LOG_ENABLE = True
 LOG_PATH = '/var/log/smartvending/system/svm-scheduled-restart.log'
@@ -49,27 +49,6 @@ def write_log(message: str):
     __lock_log.release()
 
 
-def get_fake_hwclock_datafile() -> str:
-    fake_hwclock_cmd = 'fake-hwclock'
-    fake_hwclock_dataenv = 'FILE'
-    fake_hwclock_default_datafile = '/etc/fake-hwclock.data'
-
-    # Check if fake-hwclock is available
-    test_cmd = shutil.which(fake_hwclock_cmd)
-    if test_cmd is not None and len(test_cmd) > 0:
-        datafile = os.environ.get(fake_hwclock_dataenv)
-        if datafile is not None:
-            return datafile
-        else:
-            # Return default path
-            if os.path.exists(fake_hwclock_default_datafile):
-                return fake_hwclock_default_datafile
-            else:
-                return ''
-    else:
-        return ''
-
-
 def get_system_time_utc() -> datetime:
     return datetime.datetime.now(dateutil.tz.tzutc())
 
@@ -79,16 +58,8 @@ def get_system_time_local() -> datetime:
 
 
 def is_system_time_ready() -> bool:
-    fake_hwclock_datafile = get_fake_hwclock_datafile()
-    if len(fake_hwclock_datafile) > 0:
-        # fake_hwclock data is stored in UTC format, data e.g: 2022-10-15 04:30:35
-        with open(fake_hwclock_datafile, 'r') as fd:
-            fake_hwclock_datetime = datetime.datetime.strptime(fd.read().strip(), '%Y-%m-%d %H:%M:%S').replace(tzinfo=dateutil.tz.tzutc())
-            # write_log("Loaded fake_hwclock: " + str(fake_hwclock_datetime))
-        if get_system_time_utc() > fake_hwclock_datetime:
-            return True
-        else:
-            return False
+    if get_system_time_local().year >= 2023:
+        return True
     else:
         return False
 
@@ -112,9 +83,6 @@ def exec_system_reboot():
 
     # Restart router
     subprocess.call(['/opt/svm-tools/svm-cmd-router.sh', '--reboot'])
-
-    # Save current time to fake-hwclock data
-    subprocess.call(['/usr/sbin/fake-hwclock', 'save', 'force'])
     time.sleep(5)
 
     # Restart raspi
@@ -129,15 +97,15 @@ def is_next_day(__prev_date_local: datetime) -> bool:
 
 
 if __name__ == '__main__':
-    write_log("Starting svm-scheduled-restart...")
+    # write_log("Starting svm-scheduled-restart...")
     while not is_system_time_ready():
-        write_log("Waiting system time be ready...")
+        # write_log("Waiting system time be ready...")
         time.sleep(LOOP_DELAY_SECOND)
 
-    write_log("System time is ready")
     prev_datetime_local = get_system_time_local()
     tmp_dt = datetime.datetime.strptime(SYSTEM_REBOOT_SCHEDULED_LOCAL_TIME, '%H:%M:%S')
     reboot_scheduled_datetime_local = get_system_time_local().replace(hour=tmp_dt.hour, minute=tmp_dt.minute, second=tmp_dt.second)
+    write_log("Auto reboot is scheduled at " + reboot_scheduled_datetime_local.strftime("%H:%M:%S"))
 
     while True:
         system_local_time = get_system_time_local()
