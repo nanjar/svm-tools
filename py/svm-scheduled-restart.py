@@ -58,7 +58,7 @@ def get_system_time_local() -> datetime:
 
 
 def is_system_time_ready() -> bool:
-    if os.popen('timedatectl status | grep "System clock synchronized"').read().strip()  == "System clock synchronized: yes":
+    if os.popen('timedatectl status | grep "System clock synchronized"').read().strip() == "System clock synchronized: yes":
         return True
     else:
         return False
