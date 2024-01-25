@@ -118,6 +118,10 @@ if [ ! -L /opt/nginx/proxy_temp ]; then
     sudo ln -s /var/run/nginx/proxy_temp /opt/nginx/proxy_temp
 fi
 
+if [ ! -L /smartvending/server/public/storage ]; then
+    ln -s /smartvending/server/storage /smartvending/server/public/
+fi
+
 sudo lock-system
 
 

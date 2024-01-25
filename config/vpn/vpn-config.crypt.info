@@ -1,2 +1,3 @@
-svm.start=1
-svm.end=200
+openvpn=3,200
+wireguard=3,210
+
