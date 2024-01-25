@@ -517,9 +517,9 @@ def set_vpn(vpn_no: str) -> bool:
             if os.path.exists('/dev/mapper/' + MAPPER):
                 subprocess.run('mkdir /tmp/vpn-config'.split())
                 subprocess.run(('sudo mount -o ro /dev/mapper/' + MAPPER + ' /tmp/vpn-config').split())
-                if os.path.exists('/tmp/vpn-config/SVM' + vpn_no + '.ovpn'):
+                if os.path.exists('/tmp/vpn-config/openvpn/SVM' + vpn_no + '.ovpn'):
                     subprocess.run('sudo unlock-system -p'.split())
-                    response = subprocess.run(('sudo cp ' + '/tmp/vpn-config/SVM' + vpn_no + '.ovpn' + ' /etc/openvpn/client.conf').split())
+                    response = subprocess.run(('sudo cp ' + '/tmp/vpn-config/openvpn/SVM' + vpn_no + '.ovpn' + ' /etc/openvpn/client.conf').split())
                     print_verbose("Response after applying new vpn config:", str(response))
                     current_hostname = get_hostname()
                     print_verbose('Updating hostname from ' + current_hostname + ' to SVM' + vpn_no)
