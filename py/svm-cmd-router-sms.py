@@ -58,10 +58,22 @@ def disconnect(telnet_obj: telnetlib.Telnet):
         telnet_obj.write(TELNET_PASSWD.encode('ascii') + b"\n")
         time.sleep(1)
 
-def set_sms_mode_text(telnet_obj: telnetlib.Telnet) -> bool:
-    # print("telnet:", telnet)
+def get_modem_port(telnet_obj: telnetlib.Telnet) -> str:
+    MODEM_PORT_LIST = ["/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyUSB2", "/dev/ttyUSB3"]
+    found_port = ""
+    for port in MODEM_PORT_LIST:
+        telnet_obj.write(("at-cmd " + port + " at+cmgf=1\n").encode('UTF-8'))
+        recv_resp = telnet_obj.read_until(b"root:~#", timeout=5).decode('ascii').replace("\r", "").split("\n")
+        if len(recv_resp) > 3:
+            if recv_resp[3] == "OK":
+                found_port = port
+                break
+
+    return found_port
+
+def set_sms_mode_text(telnet_obj: telnetlib.Telnet, modem_port: str) -> bool:
     if telnet_obj is not None:
-        telnet_obj.write(("at-cmd " + ROUTER_USB_DEV + " at+cmgf=1\n").encode('UTF-8'))
+        telnet_obj.write(("at-cmd " + modem_port + " at+cmgf=1\n").encode('UTF-8'))
         recv_resp = telnet_obj.read_until(b"root:~#", timeout=5).decode('ascii').replace("\r", "").split("\n")
 
         if ENABLE_DEBUG:
@@ -75,10 +87,10 @@ def set_sms_mode_text(telnet_obj: telnetlib.Telnet) -> bool:
         print("No connection to server")
         return False
 
-def read_sms_by_index(telnet_obj: telnetlib.Telnet, read_index) -> list:
+def read_sms_by_index(telnet_obj: telnetlib.Telnet, modem_port: str, read_index) -> list:
     recv_sms = []
     if telnet_obj is not None:
-        telnet_obj.write(("at-cmd " + ROUTER_USB_DEV + " at+cmgr=" + str(read_index) + "\n").encode('UTF-8'))
+        telnet_obj.write(("at-cmd " + modem_port + " at+cmgr=" + str(read_index) + "\n").encode('UTF-8'))
         recv_resp = telnet_obj.read_until(b"root:~#", timeout=5).decode('ascii').replace("\r", "").split("\n")
         # print("len(recv_resp):", len(recv_resp))
         # for index, ctx in enumerate(recv_resp):
@@ -96,14 +108,14 @@ def read_sms_by_index(telnet_obj: telnetlib.Telnet, read_index) -> list:
         print("No connection to server")
     return recv_sms
 
-def read_all_sms(telnet_obj: telnetlib.Telnet) -> list:
+def read_all_sms(telnet_obj: telnetlib.Telnet, modem_port: str) -> list:
     MAX_READ_CNT = 3
     recv_all_sms = []
     if telnet is not None:
         read_index = 0
         read_cnt = 0
         while True:
-            sms_ctx = read_sms_by_index(telnet_obj, read_index)
+            sms_ctx = read_sms_by_index(telnet_obj, modem_port, read_index)
             if len(sms_ctx) > 0:
                 read_cnt = 0
                 recv_all_sms.append(sms_ctx)
@@ -120,9 +132,9 @@ def read_all_sms(telnet_obj: telnetlib.Telnet) -> list:
     # print("recv_all_sms:", recv_all_sms)
     return recv_all_sms
 
-def delete_all_sms(telnet_obj: telnetlib.Telnet) -> bool:
+def delete_all_sms(telnet_obj: telnetlib.Telnet, modem_port: str) -> bool:
     if telnet_obj is not None:
-        telnet_obj.write(("at-cmd " + ROUTER_USB_DEV + " at+cmgd=0,4\n").encode('UTF-8'))
+        telnet_obj.write(("at-cmd " + modem_port + " at+cmgd=0,4\n").encode('UTF-8'))
         recv_resp = telnet_obj.read_until(b"root:~#", timeout=5).decode('ascii').replace("\r", "").split("\n")
         # print("len(recv_resp):", len(recv_resp), ":", recv_resp)
         if recv_resp[3] == "OK":
@@ -138,19 +150,24 @@ if __name__ == '__main__':
     user_arg = get_args()
     if len(user_arg) > 0:
         telnet = connect(telnet, ROUTER_IP_ADDR)
-        if telnet is not None:
 
+        if telnet is not None:
             if ENABLE_DEBUG:
                 print("user_arg:", user_arg)
 
+            router_modem_port = get_modem_port(telnet)
+            if router_modem_port == "":
+                print("Unable to find modem port")
+                exit()
+
             if user_arg[0] == "--delete-all-sms":
-                if delete_all_sms(telnet):
+                if delete_all_sms(telnet, router_modem_port):
                     print("All sms deleted")
                 else:
                     print("Failed to delete sms")
             elif user_arg[0] == "--read-all-sms":
-                if set_sms_mode_text(telnet):
-                    response = read_all_sms(telnet)
+                if set_sms_mode_text(telnet, router_modem_port):
+                    response = read_all_sms(telnet, router_modem_port)
 
                     if ENABLE_DEBUG:
                         print("response:", response)
