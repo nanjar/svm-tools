@@ -19,7 +19,6 @@ class TimerInterval(threading.Timer):
         except Exception as e:
             print_verbose("Exception TimerInterval:", str(e))
 
-
 # Init global var
 VERBOSE: bool = False
 LANGUAGE: str = 'id'
@@ -28,6 +27,7 @@ TIME_CHECKING_SVMID = 3.0
 TIME_CHECKING_INTERNET = 3.0
 TIME_CHECKING_WIFI = 3.0
 TIME_CHECKING_TUNNEL_IP = 3.0
+TIME_CHECKING_ENABLE_CONTINUE_BUTTON = 3.0
 
 VERBOSE_LOGFILE: str = '/var/log/smartvending/system/svm-set-machine-config.log'
 INTERNET_URL: str = '8.8.8.8'
@@ -56,6 +56,7 @@ run_task_checking_wifi: bool = True
 run_task_set_vmid: bool = True
 run_task_set_wifi_profile: bool = True
 run_task_gif_gear_player: bool = True
+run_task_enable_continue_button: bool = True
 
 buffer_process_svmid: str = ''
 buffer_process_wifi_profile: str = ''
@@ -64,6 +65,7 @@ elapse_checking_svmid: float = time.monotonic()
 elapse_checking_tunnel_ip: float = time.monotonic()
 elapse_checking_internet: float = time.monotonic()
 elapse_checking_wifi: float = time.monotonic()
+elapse_checking_enable_continue_button: float = time.monotonic()
 
 img_gif_anime_frame = []
 img_gif_anime_frame_index = 0
@@ -219,22 +221,31 @@ def create_ui_status(parent: tkinter, window_color: str, screen_width_ratio: flo
     img_icon_status_fail = open_image_with_ratio(IMG_PATH + '/icon-fail.png', screen_width_ratio, screen_height_ratio)
     font_label_status = tkinter.font.Font(family='Helvetica', size=int(25/screen_width_ratio), weight='normal')
 
-    icon_status1 = Label(parent, font=font_label_status, image=img_icon_status_fail)
-    icon_status1.place(x=900/screen_width_ratio, y=740/screen_height_ratio)
-    label_status1 = Label(parent, font=font_label_status, text="SVM id:")
-    label_status1.place(x=950/screen_width_ratio, y=743/screen_height_ratio)
-    label_status_value1 = Label(parent, font=font_label_status, text="tidak ada")
-    label_status_value1.place(x=1090/screen_width_ratio, y=743/screen_height_ratio)
+    icon_status_setsvmid = Label(parent, font=font_label_status, image=img_icon_status_fail)
+    icon_status_setsvmid.place(x=900/screen_width_ratio, y=740/screen_height_ratio)
+    label_status_setsvmid = Label(parent, font=font_label_status, text="SVM ID:")
+    label_status_setsvmid.place(x=950/screen_width_ratio, y=743/screen_height_ratio)
+    label_status_setsvmid_value = Label(parent, font=font_label_status, text="tidak ada")
+    label_status_setsvmid_value.place(x=1090/screen_width_ratio, y=743/screen_height_ratio)
 
-    icon_status2 = Label(parent, font=font_label_status, image=img_icon_status_fail)
-    icon_status2.place(x=900/screen_width_ratio, y=780/screen_height_ratio)
-    label_status2 = Label(parent, font=font_label_status, text="Koneksi ke wifi:")
-    label_status2.place(x=950/screen_width_ratio, y=783/screen_height_ratio)
-    label_status_value2 = Label(parent, font=font_label_status, text="tidak ada")
-    label_status_value2.place(x=1220/screen_width_ratio, y=783/screen_height_ratio)
+    icon_status_internet = Label(parent, font=font_label_status, image=img_icon_status_fail)
+    icon_status_internet.place(x=900/screen_width_ratio, y=780/screen_height_ratio)
+    label_status_internet = Label(parent, font=font_label_status, text="Koneksi internet:")
+    label_status_internet.place(x=950/screen_width_ratio, y=783/screen_height_ratio)
+    label_status_internet_value = Label(parent, font=font_label_status, text="tidak ada")
+    label_status_internet_value.place(x=1220/screen_width_ratio, y=783/screen_height_ratio)
 
-    handler_label_status_data['status_val1'] = [icon_status1, img_icon_status_success, img_icon_status_fail, label_status_value1]
-    handler_label_status_data['status_val2'] = [icon_status2, img_icon_status_success, img_icon_status_fail, label_status_value2]
+    icon_status_setwifi = Label(parent, font=font_label_status, image=img_icon_status_fail)
+    icon_status_setwifi.place(x=900/screen_width_ratio, y=820/screen_height_ratio)
+    label_status_setwifi = Label(parent, font=font_label_status, text="Koneksi wifi:")
+    label_status_setwifi.place(x=950/screen_width_ratio, y=823/screen_height_ratio)
+    label_status_setwifi_value = Label(parent, font=font_label_status, text="tidak ada")
+    label_status_setwifi_value.place(x=1160/screen_width_ratio, y=823/screen_height_ratio)
+
+    # Icon, success image, failed image, status value
+    handler_label_status_data['status_val_setsvmid'] = [icon_status_setsvmid, img_icon_status_success, img_icon_status_fail, label_status_setsvmid_value]
+    handler_label_status_data['status_val_internet'] = [icon_status_internet, img_icon_status_success, img_icon_status_fail, label_status_internet_value]
+    handler_label_status_data['status_val_setwifi'] = [icon_status_setwifi, img_icon_status_success, img_icon_status_fail, label_status_setwifi_value]
 
     # Holding image files so it wont be cleaned up by garbage collector
     img_holder.append(img_label_status)
@@ -260,12 +271,12 @@ def clear_numpad_textbox():
 
 def has_svmid_set() -> bool:
     global handler_label_status_data
-    svmid_set_status = handler_label_status_data['status_val1'][3]['text']
-    print('svmid_set_status:', svmid_set_status)
+    svmid_set_status = handler_label_status_data['status_val_setsvmid'][3]['text']
+    # print('svmid_set_status:', svmid_set_status)
     if 'svm' in svmid_set_status.lower():
         return True
     else:
-        return
+        return False
 
 
 def set_all_button_enable(enabled: bool):
@@ -275,10 +286,10 @@ def set_all_button_enable(enabled: bool):
 
     if enabled:
         # Only enable continue button if the svmid is already set, otherwise keep it disabled
-        if has_svmid_set():
-            handler_btn_continue['state'] = 'normal'
-        else:
-            handler_btn_continue['state'] = 'disabled'
+        # if has_svmid_set():
+        #     handler_btn_continue['state'] = 'normal'
+        # else:
+        #     handler_btn_continue['state'] = 'disabled'
 
         for btn_key in handler_btn_wifi:
             handler_btn_wifi[btn_key][0]['state'] = 'normal'
@@ -659,21 +670,21 @@ def task_set_wifi_profile():
 
     while run_task_set_wifi_profile:
         if len(buffer_process_wifi_profile) > 0:
-            status2 = handler_label_status_data['status_val2']
+            status_setwifi = handler_label_status_data['status_val_setwifi']
             if buffer_process_wifi_profile == '12':
                 remove_wpa()
                 # Set wifi is not available status
-                status2[0].config(image=status2[2])
-                status2[3].config(text='tidak ada')
+                status_setwifi[0].config(image=status_setwifi[2])
+                status_setwifi[3].config(text='tidak ada')
             else:
                 if set_wpa(buffer_process_wifi_profile):
-                    status2[0].config(image=status2[1])
-                    status2[3].config(text='Profile ' + buffer_process_wifi_profile)
+                    status_setwifi[0].config(image=status_setwifi[1])
+                    status_setwifi[3].config(text='Profile ' + buffer_process_wifi_profile)
 
                 else:
                     # Failed to change wifi profile
-                    status2[0].config(image=status2[2])
-                    status2[3].config(text='tidak ada')
+                    status_setwifi[0].config(image=status_setwifi[2])
+                    status_setwifi[3].config(text='tidak ada')
                     set_button_wifi_state(False, '')
                     
             buffer_process_wifi_profile = ''
@@ -690,13 +701,13 @@ def task_check_svmid():
         if time.monotonic() - elapse_checking_svmid > TIME_CHECKING_SVMID:
             svmid = get_hostname()
             if len(svmid) > 0:
-                status1 = handler_label_status_data['status_val1']
+                status_setsvmid = handler_label_status_data['status_val_setsvmid']
                 if svmid != 'SVM':
-                    status1[0].config(image=status1[1])
-                    status1[3].config(text=svmid)
+                    status_setsvmid[0].config(image=status_setsvmid[1])
+                    status_setsvmid[3].config(text=svmid)
                 else:
-                    status1[0].config(image=status1[2])
-                    status1[3].config(text='tidak ada')
+                    status_setsvmid[0].config(image=status_setsvmid[2])
+                    status_setsvmid[3].config(text='tidak ada')
 
                     print_verbose("SVMId:", svmid)
 
@@ -713,13 +724,13 @@ def task_check_tunnel():
     while run_task_checking_tunnel_ip:
         if time.monotonic() - elapse_checking_tunnel_ip > TIME_CHECKING_TUNNEL_IP:
             tunnel_ip = get_ip_address('tun0')
-            status2 = handler_label_status_data['status_val2']
+            status_setwifi = handler_label_status_data['status_val_setwifi']
             if len(tunnel_ip) > 0:
-                status2[0].config(image=status2[1])
-                status2[3].config(text=tunnel_ip)
+                status_setwifi[0].config(image=status_setwifi[1])
+                status_setwifi[3].config(text=tunnel_ip)
             else:
-                status2[0].config(image=status2[2])
-                status2[3].config(text='tidak ada')
+                status_setwifi[0].config(image=status_setwifi[2])
+                status_setwifi[3].config(text='tidak ada')
             print_verbose("Tunnel Ip:", tunnel_ip)
             elapse_checking_tunnel_ip = time.monotonic()
         else:
@@ -733,22 +744,22 @@ def task_check_internet():
 
     while run_task_checking_internet:
         if time.monotonic() - elapse_checking_internet > TIME_CHECKING_INTERNET:
-            status3 = handler_label_status_data['status_val3']
+            status_internet = handler_label_status_data['status_val_internet']
             try:
                 response = os.system("ping -c 1 -w2 " + INTERNET_URL + " > /dev/null 2>&1")
                 if response == 0:
-                    status3[0].config(image=status3[1])
-                    status3[3].config(text='Ok')
+                    status_internet[0].config(image=status_internet[1])
+                    status_internet[3].config(text='ok')
                 else:
-                    status3[0].config(image=status3[2])
-                    status3[3].config(text='tidak ada')
+                    status_internet[0].config(image=status_internet[2])
+                    status_internet[3].config(text='tidak ada')
 
                 print_verbose("Connection to server:", str(response))
 
             except:
                 print_verbose("Connection to server failed")
-                status3[0].config(image=status3[2])
-                status3[3].config(text='tidak ada')
+                status_internet[0].config(image=status_internet[2])
+                status_internet[3].config(text='tidak ada')
 
             elapse_checking_internet = time.monotonic()
         else:
@@ -765,13 +776,13 @@ def task_check_wifi_connection():
             process = subprocess.Popen('iwgetid -r'.split(), stdout=subprocess.PIPE)
             out, err = process.communicate()
             wifi_ssid = out.strip().decode()
-            status4 = handler_label_status_data['status_val4']
+            status_wificonnection = handler_label_status_data['status_val4']
             if len(wifi_ssid) > 0:
-                status4[0].config(image=status4[1])
-                status4[3].config(text='Ok')
+                status_wificonnection[0].config(image=status_wificonnection[1])
+                status_wificonnection[3].config(text='Ok')
             else:
-                status4[0].config(image=status4[2])
-                status4[3].config(text='tidak ada')
+                status_wificonnection[0].config(image=status_wificonnection[2])
+                status_wificonnection[3].config(text='tidak ada')
 
             print_verbose('Wifi ssid:', wifi_ssid)
 
@@ -780,17 +791,33 @@ def task_check_wifi_connection():
             time.sleep(2)
 
 
+def task_enable_continue_button():
+    global elapse_checking_enable_continue_button
+    global run_task_enable_continue_button
+    global handler_label_status_data
+
+    status_internet = handler_label_status_data['status_val_internet'][3]['text']
+
+    while run_task_enable_continue_button:
+        if time.monotonic() - elapse_checking_enable_continue_button > TIME_CHECKING_ENABLE_CONTINUE_BUTTON:
+            if has_svmid_set() and status_internet == 'ok':
+                handler_btn_continue['state'] = 'normal'
+            else:
+                handler_btn_continue['state'] = 'disabled'
+        else:
+            time.sleep(2)
+
 def open_image(image_path: str, width=None, height=None) -> PhotoImage:
     if width is not None and height is not None:
         img = Image.open(image_path)
-        return ImageTk.PhotoImage(img.resize((width, height), Image.ANTIALIAS))
+        return ImageTk.PhotoImage(img.resize((width, height), Image.LANCZOS))
     else:
         return PhotoImage(file=image_path)
 
 
 def open_image_with_ratio(image_path: str, width_ratio: float, height_ratio: float) -> PhotoImage:
     img = Image.open(image_path)
-    return ImageTk.PhotoImage(img.resize((int(img.width/width_ratio), int(img.height/height_ratio)), Image.ANTIALIAS))
+    return ImageTk.PhotoImage(img.resize((int(img.width/width_ratio), int(img.height/height_ratio)), Image.LANCZOS))
 
 
 def task_tk_window():
@@ -839,6 +866,8 @@ def task_tk_window():
     handler_btn_continue.bind("<ButtonPress>", lambda event: event_button_continue_pressed())
     handler_btn_continue.bind("<ButtonRelease>", lambda event: event_button_continue_released())
 
+    handler_btn_continue['state'] = 'disabled'
+
     create_ui_set_vmid(canvas, BACKGROUND_COLOR, screen_width_ratio, screen_height_ratio)
     create_ui_activate_wifi(canvas, BACKGROUND_COLOR, screen_width_ratio, screen_height_ratio)
     create_ui_status(canvas, BACKGROUND_COLOR, screen_width_ratio, screen_height_ratio)
@@ -871,13 +900,14 @@ if __name__ == '__main__':
     print_verbose('Loading task_set_wifi_profile...')
     threading.Thread(target=task_set_wifi_profile, daemon=True).start()
 
+    print_verbose('Loading task_check_internet...')
+    threading.Thread(target=task_check_internet, daemon=True).start()
+
     print_verbose('Loading task_check_svmid...')
     threading.Thread(target=task_check_svmid, daemon=True).start()
 
-    if has_svmid_set():
-        handler_btn_continue['state'] = 'normal'
-    else:
-        handler_btn_continue['state'] = 'disabled'
+    print_verbose('Loading task_enable_continue_button...')
+    threading.Thread(target=task_enable_continue_button, daemon=True).start()
 
     tk_window.mainloop()
 
