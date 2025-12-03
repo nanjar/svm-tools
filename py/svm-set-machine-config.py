@@ -27,11 +27,13 @@ TIME_CHECKING_SVMID = 3.0
 TIME_CHECKING_INTERNET = 3.0
 TIME_CHECKING_WIFI = 3.0
 TIME_CHECKING_TUNNEL_IP = 3.0
-TIME_CHECKING_ENABLE_CONTINUE_BUTTON = 3.0
+TIME_CHECKING_ENABLE_CONTINUE_BUTTON = 1.0
 
 VERBOSE_LOGFILE: str = '/var/log/smartvending/system/svm-set-machine-config.log'
-INTERNET_URL: str = '8.8.8.8'
+
+INTERNET_PING_URL: str = '8.8.8.8'
 IMG_PATH: str = '/opt/svm-tools/py/asset-svm-set-machine-config/img'
+
 GIF_GEAR_ANIME_PATH: str = IMG_PATH + '/gear-anime/'
 
 img_background = None
@@ -233,14 +235,14 @@ def create_ui_status(parent: tkinter, window_color: str, screen_width_ratio: flo
     label_status_internet = Label(parent, font=font_label_status, text="Koneksi internet:")
     label_status_internet.place(x=950/screen_width_ratio, y=783/screen_height_ratio)
     label_status_internet_value = Label(parent, font=font_label_status, text="tidak ada")
-    label_status_internet_value.place(x=1220/screen_width_ratio, y=783/screen_height_ratio)
+    label_status_internet_value.place(x=1240/screen_width_ratio, y=783/screen_height_ratio)
 
     icon_status_setwifi = Label(parent, font=font_label_status, image=img_icon_status_fail)
     icon_status_setwifi.place(x=900/screen_width_ratio, y=820/screen_height_ratio)
     label_status_setwifi = Label(parent, font=font_label_status, text="Koneksi wifi:")
     label_status_setwifi.place(x=950/screen_width_ratio, y=823/screen_height_ratio)
     label_status_setwifi_value = Label(parent, font=font_label_status, text="tidak ada")
-    label_status_setwifi_value.place(x=1160/screen_width_ratio, y=823/screen_height_ratio)
+    label_status_setwifi_value.place(x=1170/screen_width_ratio, y=823/screen_height_ratio)
 
     # Icon, success image, failed image, status value
     handler_label_status_data['status_val_setsvmid'] = [icon_status_setsvmid, img_icon_status_success, img_icon_status_fail, label_status_setsvmid_value]
@@ -285,12 +287,6 @@ def set_all_button_enable(enabled: bool):
     global handler_btn_numpad
 
     if enabled:
-        # Only enable continue button if the svmid is already set, otherwise keep it disabled
-        # if has_svmid_set():
-        #     handler_btn_continue['state'] = 'normal'
-        # else:
-        #     handler_btn_continue['state'] = 'disabled'
-
         for btn_key in handler_btn_wifi:
             handler_btn_wifi[btn_key][0]['state'] = 'normal'
         for btn_key in handler_btn_numpad:
@@ -398,7 +394,9 @@ def event_button_continue_pressed():
     try:
         global handler_btn_continue
         global img_btn_continue_pressed
+        global run_task_enable_continue_button
 
+        run_task_enable_continue_button = False
         if handler_btn_continue['state'] != 'disabled':
             handler_btn_continue.config(image=img_btn_continue_pressed)
 
@@ -656,12 +654,12 @@ def task_set_svm_id():
             if set_vpn(buffer_process_svmid):
                 buffer_process_svmid = ''
                 # If succeeded, enable continue button
-                handler_btn_continue['state'] = 'normal'
+                # handler_btn_continue['state'] = 'normal'
             else:
                 buffer_process_svmid = ''
                 # If failed, disable continue button
-                handler_btn_continue['state'] = 'disabled'
-        time.sleep(1)
+                # handler_btn_continue['state'] = 'disabled'
+        time.sleep(2)
 
 
 def task_set_wifi_profile():
@@ -702,6 +700,7 @@ def task_check_svmid():
             svmid = get_hostname()
             if len(svmid) > 0:
                 status_setsvmid = handler_label_status_data['status_val_setsvmid']
+                # Default hostname is SVM. This indicate the sdcard is new/haven't configured
                 if svmid != 'SVM':
                     status_setsvmid[0].config(image=status_setsvmid[1])
                     status_setsvmid[3].config(text=svmid)
@@ -746,7 +745,7 @@ def task_check_internet():
         if time.monotonic() - elapse_checking_internet > TIME_CHECKING_INTERNET:
             status_internet = handler_label_status_data['status_val_internet']
             try:
-                response = os.system("ping -c 1 -w2 " + INTERNET_URL + " > /dev/null 2>&1")
+                response = os.system("ping -c 1 -w2 " + INTERNET_PING_URL + " > /dev/null 2>&1")
                 if response == 0:
                     status_internet[0].config(image=status_internet[1])
                     status_internet[3].config(text='ok')
@@ -796,14 +795,15 @@ def task_enable_continue_button():
     global run_task_enable_continue_button
     global handler_label_status_data
 
-    status_internet = handler_label_status_data['status_val_internet'][3]['text']
-
     while run_task_enable_continue_button:
         if time.monotonic() - elapse_checking_enable_continue_button > TIME_CHECKING_ENABLE_CONTINUE_BUTTON:
+            status_internet = handler_label_status_data['status_val_internet'][3]['text']
+            print("task_enable_continue_button -->", status_internet)
             if has_svmid_set() and status_internet == 'ok':
                 handler_btn_continue['state'] = 'normal'
             else:
                 handler_btn_continue['state'] = 'disabled'
+            elapse_checking_enable_continue_button = time.monotonic()
         else:
             time.sleep(2)
 
@@ -846,7 +846,7 @@ def task_tk_window():
 
     tk_window.geometry(str(screen_width) + 'x' + str(screen_height))
     tk_window.bind('<Escape>', event_btn_pressed_esc)
-    tk_window.wm_attributes("-topmost", True)
+    tk_window.wm_attributes("-topmost", False)
     # tk_window.wm_overrideredirect(True)
     tk_window.focus_set()
 
