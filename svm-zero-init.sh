@@ -123,7 +123,7 @@ if [ -f "$INIT_MACHINE_STATE_FILE" ]; then
         wait_xserver
         
         echo "Entering jail before setting config..."
-        source /opt/svm-tools/py/asset-svm-set-machine-config/env/bin/activate
+        # source /opt/svm-tools/py/asset-svm-set-machine-config/env/bin/activate
         export DISPLAY=:0
         sudo -u pi python3 /opt/svm-tools/py/svm-set-machine-config.py
 
@@ -134,7 +134,7 @@ if [ -f "$INIT_MACHINE_STATE_FILE" ]; then
         wait_xserver
         
         echo "Entering jail before init..."
-        source /opt/svm-tools/py/asset-svm-init-machine/env/bin/activate
+        # source /opt/svm-tools/py/asset-svm-init-machine/env/bin/activate
         export DISPLAY=:0
         sudo -u pi python3 /opt/svm-tools/py/svm-init-machine.py
         cleanup_init_machine_flag
